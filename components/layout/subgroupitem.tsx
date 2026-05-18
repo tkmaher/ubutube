@@ -11,7 +11,7 @@ interface Props {
 function FilmItem({ film }: {film: SearchResult}) {
     return (
         <div className="tab2 tabs">
-            <div>{film.name}</div>
+            <a>{film.name}</a>
         </div>
     );
 }
@@ -21,15 +21,14 @@ export function SubGroupItem({ label, films }: Props) {
 
     return (
         <>
-            <div className="tab1 tabs">
+            <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>
+                <a>{label}</a>
                 
                 <button
                     className="collapse-trigger"
-                    onClick={() => setCollapsed(c => !c)}
                 >
                     {collapsed ? "+" : "-"}
                 </button>
-                <div>{label}</div>
             </div>
             <motion.div
                 animate={{ height: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}

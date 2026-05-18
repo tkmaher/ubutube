@@ -92,6 +92,46 @@ export default function Search() {
                 <div>UbuTube</div>
             </div>
 
+            
+
+            <div
+                className="search-column"
+                style={{ opacity: loading ? 0 : 1 }}
+            >
+                {searchResults.children.length === 0 && "(No results)"}
+                {priority === "artist"
+                    ? (searchResults.children as SearchTreeArtist[]).map(
+                          (artistGroup, i) => (
+                              <GroupItem
+                                  key={i}
+                                  mode="artist"
+                                  name={artistGroup.name}
+                                  yearGroups={
+                                      artistGroup.children as SearchTreeYear[]
+                                  }
+                              />
+                          )
+                      )
+                    : (searchResults.children as SearchTreeYear[]).map(
+                          (yearGroup, i) => (
+                              <GroupItem
+                                  key={i}
+                                  mode="year"
+                                  year={yearGroup.year}
+                                  artistGroups={
+                                      yearGroup.children as SearchTreeArtist[]
+                                  }
+                              />
+                          )
+                      )}
+            </div>
+            {loading && <div
+                className="search-column"
+                style={{ opacity: loading ? 1 : 0 }}
+            >
+                {loading && "Loading..."}
+            </div>}
+
             <div className="search-form">
                 <form
                     onSubmit={e => {
@@ -138,37 +178,6 @@ export default function Search() {
                             : "Oldest→Newest"}
                     </button>
                 </div>
-            </div>
-
-            <div
-                className="search-column"
-                style={{ opacity: loading ? 0 : 1 }}
-            >
-                {priority === "artist"
-                    ? (searchResults.children as SearchTreeArtist[]).map(
-                          (artistGroup, i) => (
-                              <GroupItem
-                                  key={i}
-                                  mode="artist"
-                                  name={artistGroup.name}
-                                  yearGroups={
-                                      artistGroup.children as SearchTreeYear[]
-                                  }
-                              />
-                          )
-                      )
-                    : (searchResults.children as SearchTreeYear[]).map(
-                          (yearGroup, i) => (
-                              <GroupItem
-                                  key={i}
-                                  mode="year"
-                                  year={yearGroup.year}
-                                  artistGroups={
-                                      yearGroup.children as SearchTreeArtist[]
-                                  }
-                              />
-                          )
-                      )}
             </div>
         </div>
     );

@@ -41,15 +41,15 @@ export function GroupItem(props: Props) {
               ));
 
     return (
-        <>
-            <div className="tab0 tabs">
+        <div className="tabcontainer">
+            <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
+                <a>{label}</a>
                 <button
                     className="collapse-trigger"
-                    onClick={() => setCollapsed(c => !c)}
+                    
                 >
                     {collapsed ? "+" : "-"}
                 </button>
-                <div>{label}</div>
             </div>
             <motion.div
                 animate={{ height: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
@@ -59,6 +59,6 @@ export function GroupItem(props: Props) {
             >
                 {subItems}
             </motion.div>
-        </>
+        </div>
     );
 }
