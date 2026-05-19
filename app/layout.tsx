@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/styles/globals.css";
+import "@/styles/search.css";
 import Search from "@/components/layout/search";
 import "core-js/actual/object/group-by";
 

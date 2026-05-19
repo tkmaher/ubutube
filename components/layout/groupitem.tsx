@@ -19,7 +19,7 @@ type YearModeProps = {
 type Props = ArtistModeProps | YearModeProps;
 
 export function GroupItem(props: Props) {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
 
     const label = props.mode === "artist" ? props.name : props.year;
 
@@ -30,6 +30,7 @@ export function GroupItem(props: Props) {
                       key={j}
                       label={yg.year}
                       films={yg.children as SearchResult[]}
+                      mode={props.mode}
                   />
               ))
             : props.artistGroups.map((ag, j) => (
@@ -37,16 +38,16 @@ export function GroupItem(props: Props) {
                       key={j}
                       label={ag.name}
                       films={ag.children as SearchResult[]}
+                      mode={props.mode}
                   />
               ));
 
     return (
         <div className="tabcontainer">
             <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
-                <a>{label}</a>
+                <a className={props.mode == "artist" ? "linkout" : ""}>{label}</a>
                 <button
                     className="collapse-trigger"
-                    
                 >
                     {collapsed ? "+" : "-"}
                 </button>

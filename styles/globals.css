@@ -1,0 +1,57 @@
+:root {
+  --background: #ffffff;
+  --secondary: rgb(239, 235, 231);
+  --foreground: #171717;
+  --font: Garamond, "Apple Garamond", "Baskerville", "Libre Baskerville", "Times New Roman", serif;
+}
+
+
+html {
+  height: 100%;
+  font-family: var(--font);
+  scrollbar-width: thin;
+  background-color: var(--secondary);
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  display: flex;
+
+}
+
+a, a:visited, a:hover, a:active {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+
+
+input[type="text"], button {
+  padding: 0.5em;
+  border: none;
+  transition: border-color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  &:focus {
+    outline: none;
+    border-color: var(--foreground);
+  }
+  border-radius: 3px;
+
+}
+
+button {
+  background-color: var(--background);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  button:hover {
+    background-color: var(--secondary);
+  }
+
+  .tabs:hover {
+    background-color: var(--secondary);
+  }
+}

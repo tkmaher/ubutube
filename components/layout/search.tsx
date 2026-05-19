@@ -4,6 +4,8 @@ import { SearchResult, SearchTree, SearchTreeArtist, SearchTreeYear } from "@/ty
 import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
 
+const PER_PAGE = 50;
+
 function buildTree(
     data: SearchResult[],
     priority: "artist" | "year",
@@ -25,7 +27,7 @@ function buildTree(
                     children,
                 })),
             })
-        );
+        ).sort((a, b) => a.name.localeCompare(b.name));
 
         return { children: reverse ? children.reverse() : children };
     } else {
@@ -44,7 +46,7 @@ function buildTree(
                     children,
                 })),
             })
-        );
+        ).sort((a, b) => a.year.localeCompare(b.year));
 
         return { children: reverse ? children.reverse() : children };
     }
@@ -57,6 +59,8 @@ export default function Search() {
     const [reverse, setReverse] = useState(false);
     const [rawResults, setRawResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const [page, setPage] = useState(0);
 
     useEffect(() => {
         setLoading(true);
@@ -85,14 +89,16 @@ export default function Search() {
         [rawResults, priority, reverse]
     );
 
+    useEffect(() => {
+        setPage(0);
+    }, [searchResults, priority, reverse]);
+
     return (
         <div className="left-bar">
             <div className="logo">
                 <Image src="/spirale.png" height={50} width={50} alt="UbuTube logo" />
                 <div>UbuTube</div>
             </div>
-
-            
 
             <div
                 className="search-column"
@@ -102,7 +108,7 @@ export default function Search() {
                 {priority === "artist"
                     ? (searchResults.children as SearchTreeArtist[]).map(
                           (artistGroup, i) => (
-                              <GroupItem
+                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
                                   key={i}
                                   mode="artist"
                                   name={artistGroup.name}
@@ -110,11 +116,12 @@ export default function Search() {
                                       artistGroup.children as SearchTreeYear[]
                                   }
                               />
+                            
                           )
                       )
                     : (searchResults.children as SearchTreeYear[]).map(
                           (yearGroup, i) => (
-                              <GroupItem
+                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
                                   key={i}
                                   mode="year"
                                   year={yearGroup.year}
@@ -160,11 +167,11 @@ export default function Search() {
                     >
                         {priority === "artist" ? (
                             <>
-                                <b>Artist</b> / Year
+                                Artist→Year
                             </>
                         ) : (
                             <>
-                                Artist / <b>Year</b>
+                                Year→Artist
                             </>
                         )}
                     </button>
@@ -176,6 +183,32 @@ export default function Search() {
                             : priority === "artist"
                             ? "A→Z"
                             : "Oldest→Newest"}
+                    </button>
+                </div>
+                <div className="search-row">
+                    <button
+                        onClick={() => setPage(p => Math.max(0, p - 1))}
+                        disabled={page === 0}
+                    >
+                        Previous
+                    </button>
+                    <span>
+                        Page {page + 1} of{" "}
+                        {Math.ceil(
+                            searchResults.children.length / PER_PAGE
+                        ) || 1}
+                    </span>
+                    <button
+                        onClick={() =>
+                            setPage(p =>
+                                Math.min(p + 1, Math.ceil(searchResults.children.length / PER_PAGE) - 1)
+                            )
+                        }
+                        disabled={
+                            page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1
+                        }
+                    >
+                        Next
                     </button>
                 </div>
             </div>

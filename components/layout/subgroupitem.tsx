@@ -2,28 +2,29 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { SearchResult } from "@/types/search";
+import Link from "next/link";
 
 interface Props {
+    mode: "year" | "artist";
     label: string;
     films: SearchResult[];
 }
 
 function FilmItem({ film }: {film: SearchResult}) {
+    const link = `/film/${film.name}`;
     return (
         <div className="tab2 tabs">
-            <a>{film.name}</a>
+            <Link className="linkout" href={link}>{film.name}</Link>
         </div>
     );
 }
 
-export function SubGroupItem({ label, films }: Props) {
+export function SubGroupItem({ label, films, mode }: Props) {
     const [collapsed, setCollapsed] = useState(false);
-
     return (
         <>
             <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>
-                <a>{label}</a>
-                
+                <a className={mode === "year" ? "linkout" : ""}>{label}</a>
                 <button
                     className="collapse-trigger"
                 >
