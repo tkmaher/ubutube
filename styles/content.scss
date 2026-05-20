@@ -1,6 +1,8 @@
+@use "variables" as *;
+
 .content-container {
-    height: calc(100dvh - 0.4em);
-    overflow-y: auto;
+    height: $univHeight;
+    overflow-y: none;
     overflow-x: none;
    
     padding: 0.2em;
@@ -15,15 +17,38 @@
         flex-direction: column;
         gap: 0.2em;
         max-width: 100%;
+        height: $univHeight;
+        overflow-y: auto;
+        flex-grow: 1;
     }
     .viewer-artists {
         display: flex;
+        white-space: pre;
     }
+    .content-right {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
+        min-width: 15%;
+        max-width: 15%;
+        height: $univHeight;
+        .recommended-list {
+            overflow-y: auto;
+        }
+    }
+
+    transition: opacity 0.1s ease-in-out;
 
     @media (max-width: 800px) {
         flex-direction: column;
+        gap: 2em;
+        overflow-y: auto;
+        .content-left {
+            max-width: 100%;
+            height: auto;
+        }
         .content-right {
-            order: -1;
+            max-width: 100%;
             flex-basis: auto;
         }
         

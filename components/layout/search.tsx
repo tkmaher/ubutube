@@ -9,7 +9,8 @@ const PER_PAGE = 50;
 function buildTree(
     data: SearchResult[],
     priority: "artist" | "year",
-    reverse: boolean
+    reverse: boolean,
+    querying: boolean
 ): SearchTree {
     if (priority === "artist") {
         const grouped = data.reduce((acc, item) => {
@@ -19,7 +20,7 @@ function buildTree(
             return acc;
         }, {} as Record<string, Record<string, SearchResult[]>>);
 
-        const children: SearchTreeArtist[] = Object.entries(grouped).map(
+        let children: SearchTreeArtist[] = Object.entries(grouped).map(
             ([name, years]) => ({
                 name,
                 children: Object.entries(years).map(([year, children]) => ({
@@ -27,7 +28,10 @@ function buildTree(
                     children,
                 })),
             })
-        ).sort((a, b) => a.name.localeCompare(b.name));
+        )
+
+        if (!querying)
+            children = children.sort((a, b) => a.name.localeCompare(b.name));
 
         return { children: reverse ? children.reverse() : children };
     } else {
@@ -46,7 +50,10 @@ function buildTree(
                     children,
                 })),
             })
-        ).sort((a, b) => a.year.localeCompare(b.year));
+        )
+
+        if (!querying)
+            children.sort((a, b) => a.year.localeCompare(b.year));
 
         return { children: reverse ? children.reverse() : children };
     }
@@ -76,6 +83,7 @@ export default function Search() {
                     searchResults: SearchResult[];
                     success: boolean;
                 }) => {
+                    console.log("Search API response:", data);
                     if (data.success) setRawResults(data.searchResults);
                     else console.error("Search API error:", data);
                 }
@@ -85,7 +93,7 @@ export default function Search() {
     }, [searchQuery]);
 
     const searchResults = useMemo(
-        () => buildTree(rawResults, priority, reverse),
+        () => buildTree(rawResults, priority, reverse, searchQuery != ""),
         [rawResults, priority, reverse]
     );
 

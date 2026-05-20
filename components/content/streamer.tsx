@@ -146,6 +146,7 @@ function useVideoStream(src: string): UseVideoStreamReturn {
   // ── Strategy 1: HLS ────────────────────────────────────────────────────────
   const initHls = useCallback(async (el: HTMLVideoElement): Promise<void> => {
     setStatus('loading');
+    allowIframeEscalation.current = false;
 
     // Safari (and iOS) support HLS natively — no library needed
     if (el.canPlayType('application/vnd.apple.mpegurl')) {
@@ -299,6 +300,8 @@ function useVideoStream(src: string): UseVideoStreamReturn {
   }, [src]);
 
   // ── Orchestration ──────────────────────────────────────────────────────────
+  const allowIframeEscalation = useRef(false);
+
   useEffect(() => {
     if (!src) return;
 
@@ -338,6 +341,7 @@ function useVideoStream(src: string): UseVideoStreamReturn {
         await initBlob(el);
       } catch (e) {
         console.warn('[VideoStream] Blob fetch failed, falling back to direct src:', toErrorMessage(e));
+        allowIframeEscalation.current = true;
         initDirect(el);
       }
     };
@@ -372,6 +376,7 @@ export default function VideoStream({
   const showProgress = isLoading && progress > 0;
   const showVideo    = type !== 'iframe' && status === 'ready';
   const showIframe   = type === 'iframe'  && status === 'ready';
+
 
   return (
     <div
@@ -423,6 +428,7 @@ export default function VideoStream({
         playsInline
         poster={poster}
         onError={forceIframe}
+        
         aria-hidden={!showVideo}
       />
 

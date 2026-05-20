@@ -8,13 +8,15 @@ function RecommendedFilm({src}: {src: FilmSimpler}) {
 
     return (
         <div className="content-rect tabs">
-            <Link 
-                href={`/film/${src.name}`}
-                className="linkout"
-            >
-                {src.name}
-            </Link> 
-            - {src.year}
+            <div>
+                <Link 
+                    href={`/film/${src.id}`}
+                    className="linkout"
+                >
+                    {src.name}
+                </Link> 
+                <div>{src.year}</div>
+            </div>
         </div>
     );
 }
@@ -30,7 +32,8 @@ export default function FilmViewer({slug}: {slug: string}) {
         year: "",
         ubuLink: "",
         src: "",
-        bySameArtist: []
+        bySameArtist: [],
+        id: "",
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
@@ -67,16 +70,20 @@ export default function FilmViewer({slug}: {slug: string}) {
     
     return (
         <div className="content-container">
-            {loading && <div>Loading...</div>}
+            {loading && <div className="loader">Loading...</div>}
             <div style={{opacity: loading ? 0 : 1}} className="content-columns">
                 <div className="content-left">
                     {filmData.src ? <VideoStream src={filmData.src}/>: "Error: no SRC found!"}
                     <div>{filmData.name}</div>
                     <div className="viewer-artists">
                         <div>{filmData.year}</div>
-                        <div>•</div>
-                        {filmData.artists.map((artist) => (
-                            <Link key={artist} href={`/artists/${artist}`}>{artist}</Link>
+                        <div>{" - "}</div>
+                        {filmData.artists.map((artist, i) => (
+                            <div className="tabs" key={artist}>
+                                <Link href={`/artists/${artist}`} className="linkout">
+                                    {artist}{i != filmData.artists.length - 1 && ', '}
+                                </Link>
+                            </div>
                         ))}
                     </div>
                     {filmData.description && 
@@ -90,9 +97,11 @@ export default function FilmViewer({slug}: {slug: string}) {
                     <div>
                         More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}
                     </div>
-                     {filmData.bySameArtist.map((rec, i) => (
-                        <RecommendedFilm key={i} src={rec}/>
-                    ))}
+                    <div className="recommended-list">
+                        {filmData.bySameArtist.map((rec, i) => (
+                            <RecommendedFilm key={i} src={rec}/>
+                        ))}
+                    </div>
                 </div>}
             </div>
         </div>

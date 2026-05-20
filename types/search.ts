@@ -2,6 +2,7 @@ export interface SearchResult {
 	name: string,
 	year: string,
 	artist: string,
+    id: string
 }
 
 export interface SearchTreeYear {
@@ -11,7 +12,7 @@ export interface SearchTreeYear {
 
 export interface SearchTreeArtist {
     name: string,
-    children: SearchResult[] | SearchTreeYear[]
+    children: SearchResult[] | SearchTreeYear[],
 }
 
 export interface SearchTree {

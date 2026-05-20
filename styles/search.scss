@@ -5,9 +5,9 @@
   flex-direction: column;
   align-self: flex-end;
   flex-grow: 1;
-  height: calc(100dvh - 0.4em);
-  min-width: 300px;
-  max-width: 300px;
+  height: $univHeight;
+  min-width: 20dvw;
+  max-width: 20dvw;
   padding: 0.2em;
 }
 

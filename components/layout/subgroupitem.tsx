@@ -11,7 +11,7 @@ interface Props {
 }
 
 function FilmItem({ film }: {film: SearchResult}) {
-    const link = `/film/${film.name}`;
+    const link = `/film/${film.id}`;
     return (
         <div className="tab2 tabs">
             <Link className="linkout" href={link}>{film.name}</Link>

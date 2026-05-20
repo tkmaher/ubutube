@@ -1,6 +1,7 @@
 export interface FilmSimpler {
 	name: string,
-	year?: string
+	year?: string,
+	id: string
 }
 
 export interface Film {
@@ -10,7 +11,8 @@ export interface Film {
 	year?: string,
 	ubuLink: string,
 	src?: string,
-	bySameArtist: FilmSimpler[]
+	bySameArtist: FilmSimpler[],
+	id: string
 }
 
 export interface Artist {
@@ -18,5 +20,5 @@ export interface Artist {
 	description?: string,
 	years?: string,
 	ubuLink: string,
-	bySameArtist: FilmSimpler[]
+	bySameArtist: FilmSimpler[],
 }
