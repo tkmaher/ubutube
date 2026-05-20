@@ -94,50 +94,11 @@ export default function Search() {
     }, [searchResults, priority, reverse]);
 
     return (
-        <div className="left-bar">
-            <div className="logo">
+        <div className="right-bar">
+            {/*<div className="logo">
                 <Image src="/spirale.png" height={50} width={50} alt="UbuTube logo" />
                 <div>UbuTube</div>
-            </div>
-
-            <div
-                className="search-column"
-                style={{ opacity: loading ? 0 : 1 }}
-            >
-                {searchResults.children.length === 0 && "(No results)"}
-                {priority === "artist"
-                    ? (searchResults.children as SearchTreeArtist[]).map(
-                          (artistGroup, i) => (
-                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
-                                  key={i}
-                                  mode="artist"
-                                  name={artistGroup.name}
-                                  yearGroups={
-                                      artistGroup.children as SearchTreeYear[]
-                                  }
-                              />
-                            
-                          )
-                      )
-                    : (searchResults.children as SearchTreeYear[]).map(
-                          (yearGroup, i) => (
-                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
-                                  key={i}
-                                  mode="year"
-                                  year={yearGroup.year}
-                                  artistGroups={
-                                      yearGroup.children as SearchTreeArtist[]
-                                  }
-                              />
-                          )
-                      )}
-            </div>
-            {loading && <div
-                className="search-column"
-                style={{ opacity: loading ? 1 : 0 }}
-            >
-                {loading && "Loading..."}
-            </div>}
+            </div>*/}
 
             <div className="search-form">
                 <form
@@ -149,7 +110,7 @@ export default function Search() {
                 >
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search catalog..."
                         value={searchQueryTmp}
                         onChange={e => setSearchQueryTmp(e.target.value)}
                         id="search"
@@ -185,14 +146,60 @@ export default function Search() {
                             : "Oldest→Newest"}
                     </button>
                 </div>
+                
+            </div>
+
+            <div
+                className="search-column"
+                style={{ opacity: loading ? 0 : 1 }}
+            >
+                {searchResults.children.length === 0 && "(No results)"}
+                {priority === "artist"
+                    ? (searchResults.children as SearchTreeArtist[]).map(
+                          (artistGroup, i) => (
+                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
+                                  key={i}
+                                  mode="artist"
+                                  name={artistGroup.name}
+                                  yearGroups={
+                                      artistGroup.children as SearchTreeYear[]
+                                  }
+                              />
+                            
+                          )
+                      )
+                    : (searchResults.children as SearchTreeYear[]).map(
+                          (yearGroup, i) => (
+                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
+                                  key={i}
+                                  mode="year"
+                                  year={yearGroup.year}
+                                  artistGroups={
+                                      yearGroup.children as SearchTreeArtist[]
+                                  }
+                              />
+                          )
+                      )}
+            </div>
+            {loading && <div
+                className="loader"
+                style={{ opacity: loading ? 1 : 0 }}
+            >
+                {loading && "Loading..."}
+            </div>}
+
+            
+
+            <div className="search-form">
                 <div className="search-row">
                     <button
                         onClick={() => setPage(p => Math.max(0, p - 1))}
                         disabled={page === 0}
+                        className="prev-button"
                     >
                         Previous
                     </button>
-                    <span>
+                    <span className="page-counter">
                         Page {page + 1} of{" "}
                         {Math.ceil(
                             searchResults.children.length / PER_PAGE
@@ -207,6 +214,7 @@ export default function Search() {
                         disabled={
                             page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1
                         }
+                        className="next-button"
                     >
                         Next
                     </button>

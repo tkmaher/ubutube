@@ -1,0 +1,130 @@
+@use "variables" as *;
+
+.right-bar {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  flex-grow: 1;
+  height: calc(100dvh - 0.4em);
+  min-width: 300px;
+  max-width: 300px;
+  padding: 0.2em;
+}
+
+.logo {
+  font-size: 3em;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  justify-content: center;
+  width: 100%;
+  background-color: $background;
+}
+
+.fade {
+  background: linear-gradient(to top, transparent, var(--background));
+  height: 3em;
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.reverse-fade {
+  background: linear-gradient(to bottom, transparent, var(--background));
+  height: 3em;
+  width: 100%;
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  bottom: 0;
+}
+
+.tabcontainer {
+  background-color: $background;
+}
+
+.tab0 {
+  z-index: 1;
+  display: flex;
+
+
+  hr:last-of-type {
+    flex-grow: 1;
+  }
+
+}
+
+.tab1 {
+  padding-left: 2em !important;
+}
+
+.tab2 {
+  padding-left: 4em !important;
+}
+
+
+
+
+
+.collapse-trigger {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+  transition: transform 0.15s ease;
+  display: flex;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  padding: 0 !important;
+}
+
+.search-column {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 3;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.2em;
+
+  width: 100%;
+
+  input[type="text"] {
+    flex-grow: 1;
+  }
+
+  button, input {
+    font-family: $font !important;
+    font-size: 16px !important;
+  }
+
+
+  .orderer, .sorter {
+    flex-grow: 0;
+  }
+  
+
+  .prev-button {
+    justify-self: flex-start;
+    flex-grow: 1;
+
+  }
+  .page-counter {
+    flex-grow: 1;
+    justify-self: center;
+  }
+  .next-button {
+    justify-self: flex-end;
+    flex-grow: 1;
+
+  }
+}

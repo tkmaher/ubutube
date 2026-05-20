@@ -1,0 +1,86 @@
+@use "variables" as *;
+
+html {
+  height: 100%;
+  font-family: $font;
+  scrollbar-width: thin;
+  background-color: $background;
+}
+
+html,
+body {
+  width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  display: flex;
+  font-size: 16px;
+}
+
+a, a:visited, a:hover, a:active {
+  color: $foreground;
+  text-decoration: none;
+}
+
+.main {
+  flex-grow: 1;
+}
+
+input[type="text"], button {
+  border: none;
+  transition: border-color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  &:focus {
+    outline: none;
+    border-color: $background;
+  }
+  border-radius: 3px;
+
+}
+
+button {
+  background-color: $secondary;
+  cursor: pointer;
+}
+
+.tabs {
+  cursor: crosshair;
+  display: flex;
+  align-items: center;
+  .collapse-trigger {
+    cursor: crosshair;
+    flex-grow: 1;
+    justify-content: flex-end;
+    margin-right: 0.2em;
+  }
+
+  a {
+    flex-grow: 0;
+  }
+
+  @media (hover: hover) {
+    .linkout:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    &:hover {
+      background-color: $secondary;
+    }
+  }
+
+}
+
+@media (hover: hover) {
+  button:hover {
+    background-color: $background;
+  }
+}
+
+.loader {
+  flex-grow: 1;
+  height: 100%;
+  width: 100%;
+  justify-self: center;
+  justify-content: center;
+  display: flex;
+  align-self: center;
+  align-items: center;
+}

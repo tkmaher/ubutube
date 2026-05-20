@@ -1,20 +1,37 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Film } from "@/app/types/objects"
+import { Film, FilmSimpler } from "@/types/objects"
+import Link from "next/link";
+import VideoStream from "./streamer";
 
 function RecommendedFilm({src}: {src: FilmSimpler}) {
 
     return (
-        <div>
-            {src.name} • {src.year}
+        <div className="content-rect tabs">
+            <Link 
+                href={`/film/${src.name}`}
+                className="linkout"
+            >
+                {src.name}
+            </Link> 
+            - {src.year}
         </div>
     );
 }
 
 export default function FilmViewer({slug}: {slug: string}) {
     const decodedSlug = decodeURIComponent(slug);
+    
 
-    const [filmData, setFilmData] = useState(null);
+    const [filmData, setFilmData] = useState<Film>({
+        name: "",
+        artists: [""],
+        description: "",
+        year: "",
+        ubuLink: "",
+        src: "",
+        bySameArtist: []
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
 
@@ -27,10 +44,11 @@ export default function FilmViewer({slug}: {slug: string}) {
         .then(
             (data: {
                 cached: boolean;
-                film: SearchResult[];
+                film: Film;
                 success: boolean;
             }) => {
-                if (data.success) setRawResults(data.film);
+                console.log("Film API response:", data);
+                if (data.success) setFilmData(data.film);
                 else {
                     console.error("Search API error:", data);
                     setError(true);
@@ -39,7 +57,7 @@ export default function FilmViewer({slug}: {slug: string}) {
         )
         .catch(err => console.error("Search fetch error:", err))
         .finally(() => setLoading(false));
-    }, [searchQuery]);
+    }, [slug]);
 
     if (error) return (
         <div>
@@ -48,34 +66,35 @@ export default function FilmViewer({slug}: {slug: string}) {
     );
     
     return (
-        <>
+        <div className="content-container">
             {loading && <div>Loading...</div>}
-            <div style={{opacity: loading ? 0 : 1}}>
-                <div className="content-left>
-                    {filmData.src ? <iframe src={filmData.src}/> : "Error: no SRC found!"}
+            <div style={{opacity: loading ? 0 : 1}} className="content-columns">
+                <div className="content-left">
+                    {filmData.src ? <VideoStream src={filmData.src}/>: "Error: no SRC found!"}
+                    <div>{filmData.name}</div>
                     <div className="viewer-artists">
                         <div>{filmData.year}</div>
                         <div>•</div>
-                        {filmData.artists.map((artist, i) => {
-                            <Link href=`/artists/${artist}`>{artist}</Link>
-                        })}
+                        {filmData.artists.map((artist) => (
+                            <Link key={artist} href={`/artists/${artist}`}>{artist}</Link>
+                        ))}
                     </div>
                     {filmData.description && 
                         <div>{filmData.description}</div>
                     }
-                    <a href=`https://ubu.com/film/${filmData.ubuLink}` target="_blank">
+                    <a href={`https://ubu.com/film/${filmData.ubuLink}`} target="_blank">
                         Watch on ubu.com
                     </a>
                 </div>
-                {filmData.artists.length > 0 && <div className="content-right>
+                {filmData.bySameArtist.length > 0 && <div className="content-right">
                     <div>
-                        More by {filmData.artists.length > 1 ? "these artists:" : "this artist:")
+                        More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}
                     </div>
-                     {filmData.bySameArtist.map((rec, i) => {
-                        <RecommendedFilm src={rec}/>
-                    })}
+                     {filmData.bySameArtist.map((rec, i) => (
+                        <RecommendedFilm key={i} src={rec}/>
+                    ))}
                 </div>}
             </div>
-        </>
+        </div>
     );
 }

@@ -1,4 +1,5 @@
 import FilmViewer from "@/components/content/filmViewer";
+import "@/styles/content.scss";
 
 export default async function Page({
     params,

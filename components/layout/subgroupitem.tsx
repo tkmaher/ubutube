@@ -25,11 +25,11 @@ export function SubGroupItem({ label, films, mode }: Props) {
         <>
             <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>
                 <a className={mode === "year" ? "linkout" : ""}>{label}</a>
-                <button
+                <div
                     className="collapse-trigger"
                 >
                     {collapsed ? "+" : "-"}
-                </button>
+                </div>
             </div>
             <motion.div
                 animate={{ height: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}

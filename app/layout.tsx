@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import "@/styles/globals.css";
-import "@/styles/search.css";
+import "@/styles/globals.scss";
+import "@/styles/search.scss";
 import Search from "@/components/layout/search";
-import "core-js/actual/object/group-by";
+import { ReactLenis } from 'lenis/react'
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,8 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <div className="main">{children}</div>
         <Search/>
-        {children}
       </body>
     </html>
   );
