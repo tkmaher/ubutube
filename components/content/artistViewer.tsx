@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Artist, FilmSimpler } from "@/types/objects"
 import Link from "next/link";
+import ReactLenis from "lenis/react";
 
 function RecommendedFilm({src}: {src: FilmSimpler}) {
     return (
@@ -65,26 +66,42 @@ export default function ArtistViewer({slug}: {slug: string}) {
         <div className="content-container">
             {loading && <div className="loader">Loading...</div>}
             <div style={{opacity: loading ? 0 : 1}} className="content-columns">
-                <div className="content-left">
+                <ReactLenis
+                    className="content-left content-left-artists"
+                    data-lenis-prevent  
+                    options={{
+                        lerp: 0.1,      
+                        syncTouch: true,
+                    }}
+                >
                     <div>{artistData.name}</div>
                     <div>{artistData.years}</div>
                     {artistData.description && 
                         <div>{artistData.description}</div>
                     }
+                    <br/>
                     <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
                         View on ubu.com
                     </a>
-                </div>
-                {artistData.bySameArtist.length > 0 && <div>
-                    <div>
-                        Films by {artistData.name}: 
-                    </div>
-                    <div className="recommended-list">
-                        {artistData.bySameArtist.map((rec, i) => (
-                            <RecommendedFilm key={i} src={rec}/>
-                        ))}
-                    </div>
-                </div>}
+                </ReactLenis>
+                {artistData.bySameArtist.length > 0 && 
+                    <ReactLenis className="content-recommended-artists"
+                        data-lenis-prevent  
+                        options={{
+                            lerp: 0.1,      
+                            syncTouch: true,
+                        }}
+                    >
+                        <div>
+                            Films by {artistData.name}: 
+                        </div>
+                        <div className="recommended-list">
+                            {artistData.bySameArtist.map((rec, i) => (
+                                <RecommendedFilm key={i} src={rec}/>
+                            ))}
+                        </div>
+                    </ReactLenis>
+                }
             </div>
         </div>
     );

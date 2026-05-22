@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { SearchResult } from "@/types/search";
 import Link from "next/link";
@@ -8,6 +8,7 @@ interface Props {
     mode: "year" | "artist";
     label: string;
     films: SearchResult[];
+    query: string;
 }
 
 function FilmItem({ film }: {film: SearchResult}) {
@@ -19,8 +20,13 @@ function FilmItem({ film }: {film: SearchResult}) {
     );
 }
 
-export function SubGroupItem({ label, films, mode }: Props) {
+export function SubGroupItem({ label, films, mode, query }: Props) {
     const [collapsed, setCollapsed] = useState(false);
+
+    useEffect(() => {
+        setCollapsed(false);
+    }, [query]);
+
     return (
         <>
             <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>

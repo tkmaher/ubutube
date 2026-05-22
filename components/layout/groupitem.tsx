@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { SearchResult, SearchTreeArtist, SearchTreeYear } from "@/types/search";
 import { SubGroupItem } from "@/components/layout/subgroupitem";
@@ -9,12 +9,14 @@ type ArtistModeProps = {
     mode: "artist";
     name: string;
     yearGroups: SearchTreeYear[];
+    query: string;
 };
 
 type YearModeProps = {
     mode: "year";
     year: string;
     artistGroups: SearchTreeArtist[];
+    query: string;
 };
 
 type Props = ArtistModeProps | YearModeProps;
@@ -24,6 +26,10 @@ export function GroupItem(props: Props) {
 
     const label = props.mode === "artist" ? props.name : props.year;
 
+    useEffect(() => {
+        setCollapsed(true);
+    }, [props.query]);
+
     const subItems =
         props.mode === "artist"
             ? props.yearGroups.map((yg, j) => (
@@ -32,6 +38,7 @@ export function GroupItem(props: Props) {
                       label={yg.year}
                       films={yg.children as SearchResult[]}
                       mode={props.mode}
+                      query={props.query}
                   />
               ))
             : props.artistGroups.map((ag, j) => (
@@ -40,6 +47,7 @@ export function GroupItem(props: Props) {
                       label={ag.name}
                       films={ag.children as SearchResult[]}
                       mode={props.mode}
+                      query={props.query}
                   />
               ));
 

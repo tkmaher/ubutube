@@ -28,6 +28,11 @@
             overflow-y: auto;
         }
     }
+    .content-left-artists, .content-recommended-artists {
+        flex-basis: 50%;
+        overflow-y: auto;
+        height: $univHeight;
+    }
     .viewer-artists {
         display: flex;
         white-space: pre;
@@ -73,9 +78,7 @@
         .stats {
             display: flex;
             gap: 0.5em;
-            .views {
-                pointer-events: none;
-            }
+           
             button {
                 font-size: 16px;
                 font-family: $font !important;

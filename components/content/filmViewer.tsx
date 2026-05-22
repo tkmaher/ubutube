@@ -108,9 +108,9 @@ export default function FilmViewer({slug}: {slug: string}) {
                         <div className="viewer-title">
                             <div>{filmData.name}</div>
                             <div className="stats">
-                                <button className="views">
+                                <div>
                                     1000 views
-                                </button>
+                                </div>
                                 <button>
                                     bookmark
                                 </button>
@@ -131,8 +131,9 @@ export default function FilmViewer({slug}: {slug: string}) {
                             ))}
                         </div>
                         {filmData.description && 
-                            <div>{filmData.description}</div>
+                            <div dangerouslySetInnerHTML={{__html: filmData.description}}/>
                         }
+                        <br/>
                         <a href={`https://ubu.com/film/${filmData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
                             Watch on ubu.com
                         </a>

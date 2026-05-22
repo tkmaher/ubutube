@@ -156,6 +156,7 @@ export default function Search() {
                     </button>
                 </div>
                 
+                
             </div>
 
             <ReactLenis
@@ -178,6 +179,7 @@ export default function Search() {
                                   yearGroups={
                                       artistGroup.children as SearchTreeYear[]
                                   }
+                                  query={searchQuery}
                               />
                             
                           )
@@ -191,6 +193,7 @@ export default function Search() {
                                   artistGroups={
                                       yearGroup.children as SearchTreeArtist[]
                                   }
+                                  query={searchQuery}
                               />
                           )
                       )}
