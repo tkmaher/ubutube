@@ -24,7 +24,16 @@ export function SubGroupItem({ label, films, mode }: Props) {
     return (
         <>
             <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>
-                <a className={mode === "year" ? "linkout" : ""}>{label}</a>
+                {mode != "artist" ?
+                    <Link 
+                        className="linkout" href={`/artist/${label}`}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {label}
+                    </Link>
+                    :
+                    <a>{label}</a>
+                }
                 <div
                     className="collapse-trigger"
                 >

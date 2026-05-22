@@ -95,6 +95,7 @@
 .search-row {
   display: flex;
   gap: 0.2em;
+  justify-content: space-between;
 
   width: 100%;
 
@@ -107,24 +108,11 @@
     font-size: 16px !important;
   }
 
-
   .orderer, .sorter {
     flex-grow: 0;
   }
-  
 
-  .prev-button {
-    justify-self: flex-start;
-    flex-grow: 1;
-
-  }
   .page-counter {
-    flex-grow: 1;
     justify-self: center;
-  }
-  .next-button {
-    justify-self: flex-end;
-    flex-grow: 1;
-
   }
 }

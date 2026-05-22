@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { SearchResult, SearchTreeArtist, SearchTreeYear } from "@/types/search";
 import { SubGroupItem } from "@/components/layout/subgroupitem";
+import Link from "next/link";
 
 type ArtistModeProps = {
     mode: "artist";
@@ -45,7 +46,16 @@ export function GroupItem(props: Props) {
     return (
         <div className="tabcontainer">
             <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
-                <a className={props.mode == "artist" ? "linkout" : ""}>{label}</a>
+                {props.mode == "artist" ?
+                    <Link 
+                        className="linkout" href={`/artist/${label}`}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        {label}
+                    </Link>
+                    :
+                    <a>{label}</a>
+                }
                 <div
                     className="collapse-trigger"
                 >

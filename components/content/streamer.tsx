@@ -146,7 +146,6 @@ function useVideoStream(src: string): UseVideoStreamReturn {
   // ── Strategy 1: HLS ────────────────────────────────────────────────────────
   const initHls = useCallback(async (el: HTMLVideoElement): Promise<void> => {
     setStatus('loading');
-    allowIframeEscalation.current = false;
 
     // Safari (and iOS) support HLS natively — no library needed
     if (el.canPlayType('application/vnd.apple.mpegurl')) {
@@ -300,8 +299,6 @@ function useVideoStream(src: string): UseVideoStreamReturn {
   }, [src]);
 
   // ── Orchestration ──────────────────────────────────────────────────────────
-  const allowIframeEscalation = useRef(false);
-
   useEffect(() => {
     if (!src) return;
 
@@ -341,7 +338,6 @@ function useVideoStream(src: string): UseVideoStreamReturn {
         await initBlob(el);
       } catch (e) {
         console.warn('[VideoStream] Blob fetch failed, falling back to direct src:', toErrorMessage(e));
-        allowIframeEscalation.current = true;
         initDirect(el);
       }
     };
@@ -372,11 +368,9 @@ export default function VideoStream({
 }: VideoStreamProps) {
   const { videoRef, type, status, progress, forceIframe } = useVideoStream(src);
 
-  const isLoading    = status === 'loading';
-  const showProgress = isLoading && progress > 0;
   const showVideo    = type !== 'iframe' && status === 'ready';
   const showIframe   = type === 'iframe'  && status === 'ready';
-
+  const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <div
@@ -385,24 +379,9 @@ export default function VideoStream({
       aria-label="Video player"
     >
       {/* ── Loading overlay ──────────────────────────────────────────── */}
-      {isLoading && (
+      {!isLoaded && (
         <div className="vs-overlay">
-          <div className="vs-spinner" aria-hidden="true" />
-          <span className="vs-label">
-            {showProgress ? `${progress}%` : 'Streaming…'}
-          </span>
-          <div
-            className="vs-bar-track"
-            role="progressbar"
-            aria-valuenow={progress}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="vs-bar-fill"
-              style={{ width: showProgress ? `${progress}%` : '0%' }}
-            />
-          </div>
+            Buffering...
         </div>
       )}
 
@@ -414,13 +393,14 @@ export default function VideoStream({
       )}
 
       {/* ── Native video ─────────────────────────────────────────────── */}
-      <video
+      {!showIframe && <video
         ref={videoRef}
         className="vs-media"
         style={{
-          opacity:       showVideo ? 1 : 0,
-          pointerEvents: showVideo ? 'auto' : 'none',
+            opacity:       isLoaded ? 1 : 0,
+            pointerEvents: showVideo ? 'auto' : 'none',
         }}
+        onLoadedData={() => setIsLoaded(true)}
         controls={controls}
         autoPlay={autoPlay}
         muted={muted}
@@ -428,9 +408,8 @@ export default function VideoStream({
         playsInline
         poster={poster}
         onError={forceIframe}
-        
         aria-hidden={!showVideo}
-      />
+      />}
 
       {/* ── iframe fallback ──────────────────────────────────────────── */}
       {showIframe && (
@@ -442,6 +421,10 @@ export default function VideoStream({
           allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           referrerPolicy="no-referrer-when-downgrade"
           loading="lazy"
+          style={{
+            opacity:       isLoaded ? 1 : 0,
+            pointerEvents: showVideo ? 'auto' : 'none',
+        }   }
         />
       )}
     </div>

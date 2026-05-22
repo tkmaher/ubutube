@@ -57,10 +57,6 @@ button {
   }
 
   @media (hover: hover) {
-    .linkout:hover {
-      text-decoration: underline;
-      cursor: pointer;
-    }
     &:hover {
       background-color: $secondary;
     }
@@ -69,8 +65,20 @@ button {
 }
 
 @media (hover: hover) {
+  .linkout:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    background-color: $secondary;
+  }
+}
+
+@media (hover: hover) {
   button:hover {
     background-color: $background;
+  }
+
+  .ubu-linkout {
+    width: fit-content;
   }
 }
 

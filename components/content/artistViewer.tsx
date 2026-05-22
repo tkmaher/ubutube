@@ -22,7 +22,7 @@ function RecommendedFilm({src}: {src: FilmSimpler}) {
 export default function ArtistViewer({slug}: {slug: string}) {
     const decodedSlug = decodeURIComponent(slug);
     
-    const [artistData, setArtistData] = useState<Film>({
+    const [artistData, setArtistData] = useState<Artist>({
         name: "",
         description: "",
         years: "",
@@ -68,10 +68,10 @@ export default function ArtistViewer({slug}: {slug: string}) {
                 <div className="content-left">
                     <div>{artistData.name}</div>
                     <div>{artistData.years}</div>
-                    {filmData.description && 
+                    {artistData.description && 
                         <div>{artistData.description}</div>
                     }
-                    <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank">
+                    <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
                         View on ubu.com
                     </a>
                 </div>

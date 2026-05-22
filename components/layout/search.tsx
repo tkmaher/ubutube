@@ -3,6 +3,7 @@ import Image from "next/image";
 import { SearchResult, SearchTree, SearchTreeArtist, SearchTreeYear } from "@/types/search";
 import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
+import { ReactLenis } from 'lenis/react'
 
 const PER_PAGE = 50;
 
@@ -157,9 +158,14 @@ export default function Search() {
                 
             </div>
 
-            <div
+            <ReactLenis
                 className="search-column"
                 style={{ opacity: loading ? 0 : 1 }}
+                data-lenis-prevent  
+                options={{
+                    lerp: 0.1,      
+                    syncTouch: true,
+                }}
             >
                 {searchResults.children.length === 0 && "(No results)"}
                 {priority === "artist"
@@ -188,7 +194,7 @@ export default function Search() {
                               />
                           )
                       )}
-            </div>
+            </ReactLenis>
             {loading && <div
                 className="loader"
                 style={{ opacity: loading ? 1 : 0 }}
@@ -203,11 +209,10 @@ export default function Search() {
                     <button
                         onClick={() => setPage(p => Math.max(0, p - 1))}
                         disabled={page === 0}
-                        className="prev-button"
                     >
-                        Previous
+                        ←
                     </button>
-                    <span className="page-counter">
+                    <span>
                         Page {page + 1} of{" "}
                         {Math.ceil(
                             searchResults.children.length / PER_PAGE
@@ -222,9 +227,8 @@ export default function Search() {
                         disabled={
                             page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1
                         }
-                        className="next-button"
                     >
-                        Next
+                        →
                     </button>
                 </div>
             </div>
