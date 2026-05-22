@@ -65,6 +65,23 @@
         display: flex;
         justify-content: space-between;
     }
+
+    .viewer-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .stats {
+            display: flex;
+            gap: 0.5em;
+            .views {
+                pointer-events: none;
+            }
+            button {
+                font-size: 16px;
+                font-family: $font !important;
+            }
+        }
+    }
 }
 
 

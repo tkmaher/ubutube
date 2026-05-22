@@ -12,7 +12,7 @@
  *   6. Native video element emits error                             → <iframe src>
  */
 
-import { useEffect, useRef, useState, useCallback, CSSProperties } from 'react';
+import React, { useEffect, useRef, useState, useCallback, CSSProperties } from 'react';
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -372,6 +372,30 @@ export default function VideoStream({
   const showIframe   = type === 'iframe'  && status === 'ready';
   const [isLoaded, setIsLoaded] = useState(false);
 
+//   useEffect(() => {
+//     const handleGlobalKeyDown = (event: KeyboardEvent) => {
+//       if (event.key === ' ') {
+//         event.preventDefault();
+//         videoRef.current?.paused ? videoRef.current.play() : videoRef.current?.pause();
+//       }
+//       if (event.key.toLowerCase() === 'f') {
+//         if (videoRef.current) {
+//           if (document.fullscreenElement) {
+//             document.exitFullscreen();
+//           } else {
+//             videoRef.current.requestFullscreen();
+//           }
+//         }
+//       }
+//     };
+
+//     window.addEventListener('keydown', handleGlobalKeyDown);
+
+//     return () => {
+//       window.removeEventListener('keydown', handleGlobalKeyDown);
+//     };
+//   }, []);
+
   return (
     <div
       className={`vs-root ${className}`}
@@ -414,19 +438,20 @@ export default function VideoStream({
       {/* ── iframe fallback ──────────────────────────────────────────── */}
       {showIframe && (
         <iframe
-          src={src}
-          className="vs-media"
-          title="Video player"
-          allowFullScreen
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          referrerPolicy="no-referrer-when-downgrade"
-          loading="lazy"
-          style={{
+            src={src}
+            className="vs-media"
+            title="Video player"
+            allowFullScreen
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            referrerPolicy="no-referrer-when-downgrade"
+            loading="lazy"
+            onLoad={() => setIsLoaded(true)}  // 👈 iframes use onLoad, not onLoadedData
+            style={{
             opacity:       isLoaded ? 1 : 0,
-            pointerEvents: showVideo ? 'auto' : 'none',
-        }   }
+            pointerEvents: showIframe ? 'auto' : 'none',  // 👈 correct variable
+            }}
         />
-      )}
+        )}
     </div>
   );
 }

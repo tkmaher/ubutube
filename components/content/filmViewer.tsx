@@ -67,7 +67,7 @@ export default function FilmViewer({slug}: {slug: string}) {
         )
         .catch(err => console.error("Search fetch error:", err))
         .finally(() => setLoading(false));
-    }, [slug]);
+    }, [slug]);        
 
     if (error) return (
         <div>
@@ -105,7 +105,20 @@ export default function FilmViewer({slug}: {slug: string}) {
                             syncTouch: true,
                         }}
                     >
-                        <div>{filmData.name}</div>
+                        <div className="viewer-title">
+                            <div>{filmData.name}</div>
+                            <div className="stats">
+                                <button className="views">
+                                    1000 views
+                                </button>
+                                <button>
+                                    bookmark
+                                </button>
+                                <button>
+                                    share
+                                </button>
+                            </div>
+                        </div>
                         <div className="viewer-artists">
                             <div>{filmData.year}</div>
                             <div>{" - "}</div>
@@ -129,7 +142,7 @@ export default function FilmViewer({slug}: {slug: string}) {
                         <a onClick={() => nav("forward")} className="linkout">Next</a>
                     </div>}
                 </div>
-                {filmData.bySameArtist.length > 0 && <div className="content-right">
+                {(filmData.bySameArtist.length > 1) && <div className="content-right">
                     <div>
                         More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}
                     </div>
