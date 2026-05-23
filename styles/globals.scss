@@ -64,12 +64,8 @@ button {
 
 }
 
-@media (hover: hover) {
-  .linkout:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    background-color: $secondary;
-  }
+.linkout {
+  @include link-style;
 }
 
 @media (hover: hover) {

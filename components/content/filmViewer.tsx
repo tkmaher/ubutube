@@ -23,51 +23,46 @@ function RecommendedFilm({src}: {src: FilmSimpler}) {
     );
 }
 
-export default function FilmViewer({slug}: {slug: string}) {
+export default function FilmViewer({
+    slug,
+    initialData,
+}: {
+    slug: string;
+    initialData: Film | null;
+}) {
     const decodedSlug = decodeURIComponent(slug);
-    
 
-    const [filmData, setFilmData] = useState<Film>({
-        name: "",
-        artists: [""],
-        description: "",
-        year: "",
-        ubuLink: "",
-        src: "",
-        bySameArtist: [],
-        id: "",
-    });
-    const [loading, setLoading] = useState(false);
+    const [filmData, setFilmData] = useState<Film>(
+        initialData ?? {
+            name: "", artists: [""], description: "",
+            year: "", ubuLink: "", src: "", bySameArtist: [], id: "",
+        }
+    );
+    const [loading, setLoading] = useState(!initialData); // skip loading if we have data
     const [error, setError] = useState(false);
-    const [vidIndexInQueue, setVidIndexInQueue] = useState(0);
+    const [vidIndexInQueue, setVidIndexInQueue] = useState(() => {
+        if (!initialData) return 0;
+        const i = initialData.bySameArtist.findIndex(f => f.id === initialData.id);
+        return i !== -1 ? i : 0;
+    });
 
     useEffect(() => {
+        if (initialData) return; // data already provided by server — skip fetch
         setLoading(true);
-        fetch(
-            `https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}`
-        )
-        .then(res => res.json())
-        .then(
-            (data: {
-                cached: boolean;
-                film: Film;
-                success: boolean;
-            }) => {
-                console.log("Film API response:", data);
+        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}`)
+            .then(res => res.json())
+            .then((data: { cached: boolean; film: Film; success: boolean }) => {
                 if (data.success) {
                     setFilmData(data.film);
                     const i = data.film.bySameArtist.findIndex(f => f.id === data.film.id);
                     if (i !== -1) setVidIndexInQueue(i);
-                }
-                else {
-                    console.error("Search API error:", data);
+                } else {
                     setError(true);
                 }
-            }
-        )
-        .catch(err => console.error("Search fetch error:", err))
-        .finally(() => setLoading(false));
-    }, [slug]);        
+            })
+            .catch(err => console.error("Fetch error:", err))
+            .finally(() => setLoading(false));
+    }, [slug]);  
 
     if (error) return (
         <div>
@@ -131,7 +126,7 @@ export default function FilmViewer({slug}: {slug: string}) {
                             ))}
                         </div>
                         {filmData.description && 
-                            <div dangerouslySetInnerHTML={{__html: filmData.description}}/>
+                            <div className="viewer-description" dangerouslySetInnerHTML={{__html: filmData.description}}/>
                         }
                         <br/>
                         <a href={`https://ubu.com/film/${filmData.ubuLink}`} target="_blank" className="linkout ubu-linkout">

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "@/styles/globals.scss";
 import "@/styles/search.scss";
 import Search from "@/components/layout/search";
-import { ReactLenis } from 'lenis/react'
+import { AuthProvider } from "@/context/AuthContext";
+import Tools from "@/components/layout/tools";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,8 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-          <div className="main">{children}</div>
-          <Search/>
+          <AuthProvider>
+            <Tools/>
+            <div className="main">{children}</div>
+            <Search/>
+          </AuthProvider>
       </body>
     </html>
   );

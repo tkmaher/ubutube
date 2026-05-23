@@ -30,12 +30,17 @@
     }
     .content-left-artists, .content-recommended-artists {
         flex-basis: 50%;
-        overflow-y: auto;
         height: $univHeight;
+        max-width: none !important;
     }
     .viewer-artists {
         display: flex;
         white-space: pre;
+    }
+    .viewer-description {
+        a {
+            @include link-style;
+        }
     }
     .content-right {
         display: flex;
@@ -44,9 +49,11 @@
         min-width: 15%;
         max-width: 15%;
         height: $univHeight;
-        .recommended-list {
-            overflow-y: auto;
-        }
+    }
+
+    .recommended-list {
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     transition: opacity 0.1s ease-in-out;

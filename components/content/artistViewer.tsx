@@ -85,22 +85,22 @@ export default function ArtistViewer({slug}: {slug: string}) {
                     </a>
                 </ReactLenis>
                 {artistData.bySameArtist.length > 0 && 
-                    <ReactLenis className="content-recommended-artists"
-                        data-lenis-prevent  
-                        options={{
-                            lerp: 0.1,      
-                            syncTouch: true,
-                        }}
-                    >
+                    <div className="content-right content-recommended-artists">
                         <div>
                             Films by {artistData.name}: 
                         </div>
-                        <div className="recommended-list">
+                        <ReactLenis className="recommended-list"
+                            data-lenis-prevent  
+                            options={{
+                                lerp: 0.1,      
+                                syncTouch: true,
+                            }} 
+                        >
                             {artistData.bySameArtist.map((rec, i) => (
                                 <RecommendedFilm key={i} src={rec}/>
                             ))}
-                        </div>
-                    </ReactLenis>
+                        </ReactLenis>
+                    </div>
                 }
             </div>
         </div>

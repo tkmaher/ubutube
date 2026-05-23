@@ -1,0 +1,40 @@
+const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ubu-worker.tomaszkkmaher.workers.dev";
+
+export type AuthUser = { id: string; username: string; email: string };
+
+const call = async (path: string, init?: RequestInit) => {
+  const res = await fetch(`${API}${path}`, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    ...init,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Request failed");
+  return data;
+};
+
+export const register = (username: string, email: string, password: string) =>
+  call("/api/auth/register", { method: "POST", body: JSON.stringify({ username, email, password }) });
+
+export const login = async (email: string, password: string): Promise<AuthUser> =>
+  (await call("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) })).user;
+
+export const logout = () =>
+  call("/api/auth/logout", { method: "POST" });
+
+export const getMe = async (): Promise<AuthUser | null> => {
+  try { return (await call("/api/auth/me")).user; }
+  catch { return null; }
+};
+
+export const verifyEmail = (token: string) =>
+  call("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) });
+
+export const forgotPassword = (email: string) =>
+  call("/api/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) });
+
+export const resetPassword = (token: string, password: string) =>
+  call("/api/auth/reset-password", { method: "POST", body: JSON.stringify({ token, password }) });
+
+export const deleteAccount = (password: string) =>
+  call("/api/auth/account", { method: "DELETE", body: JSON.stringify({ password }) });

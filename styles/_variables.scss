@@ -4,3 +4,13 @@ $foreground: #171717;
 $font: Garamond, "Apple Garamond", "Baskerville", "Libre Baskerville", "Times New Roman", serif;
 
 $univHeight: calc(100dvh - 0.4em);
+
+@mixin link-style {
+    color: $foreground;
+    text-decoration: none;
+    &:hover {
+        background-color: $secondary;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+}
