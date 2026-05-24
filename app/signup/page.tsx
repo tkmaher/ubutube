@@ -2,8 +2,12 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { register } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+
 
 export default function SignupPage() {
+  const router        = useRouter();
+
   const [username, setUsername] = useState("");
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
@@ -28,39 +32,31 @@ export default function SignupPage() {
   if (success) {
     return (
       <div className="auth-page">
-        <div className="auth-card">
-          <Link href="/" className="auth-logo">𖦹UbuTube</Link>
-          <h1>Check your email</h1>
-          <p className="auth-message">
-            We sent a verification link to <strong>{email}</strong>.
-            Click it to activate your account.
-          </p>
-          <Link href="/login" className="auth-btn auth-btn--inline">Go to login</Link>
+        <div>
+          We sent a verification link to <strong>{email}</strong>.
+          Click it to activate your account.
         </div>
+        <Link href="/login" className="linkout ubu-linkout">Go to login</Link>
       </div>
     );
   }
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <Link href="/" className="auth-logo">𖦹UbuTube</Link>
-        <h1>Create account</h1>
-
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <p className="auth-error">{error}</p>}
+          {error && <div className="auth-error">{error}</div>}
 
           <label>
-            Username
+            <div>Username</div>
             <input
-              type="text" value={username} required minLength={3} maxLength={32}
+              type="username" value={username} required minLength={3} maxLength={32}
               autoComplete="username" placeholder="3–32 characters"
               onChange={e => setUsername(e.target.value)}
             />
           </label>
 
           <label>
-            Email
+            <div>Email</div>
             <input
               type="email" value={email} required autoComplete="email"
               onChange={e => setEmail(e.target.value)}
@@ -68,7 +64,7 @@ export default function SignupPage() {
           </label>
 
           <label>
-            Password
+            <div>Password</div>
             <input
               type="password" value={password} required minLength={8}
               autoComplete="new-password" placeholder="Minimum 8 characters"
@@ -76,15 +72,14 @@ export default function SignupPage() {
             />
           </label>
 
-          <button type="submit" className="auth-btn" disabled={loading}>
+          <button type="submit" className="ubu-linkout" disabled={loading}>
             {loading ? "Creating account…" : "Create account"}
           </button>
         </form>
 
-        <p className="auth-switch">
-          Already have an account? <Link href="/login">Log in</Link>
-        </p>
-      </div>
+        <div>
+          Already have an account? <button onClick={() => router.push("/login")}>Log in</button>
+        </div>
     </div>
   );
 }

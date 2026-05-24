@@ -18,33 +18,27 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <Link href="/" className="auth-logo">𖦹UbuTube</Link>
-        <h1>Forgot password</h1>
 
         {sent ? (
-          <p className="auth-message">
+          <div className="auth-message">
             If that email is registered, we sent a reset link. Check your inbox.
-          </p>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="auth-form">
             <label>
-              Email
+              <div>Email</div>
               <input
                 type="email" value={email} required autoComplete="email"
                 onChange={e => setEmail(e.target.value)}
               />
             </label>
-            <button type="submit" className="auth-btn" disabled={loading}>
+            <button type="submit" className="ubu-linkout" disabled={loading}>
               {loading ? "Sending…" : "Send reset link"}
             </button>
           </form>
         )}
 
-        <p className="auth-switch">
-          <Link href="/login">Back to login</Link>
-        </p>
-      </div>
+        <Link href="/login" className="linkout ubu-linkout">Back to login</Link>
     </div>
   );
 }

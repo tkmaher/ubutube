@@ -33,12 +33,8 @@ export default function LoginPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <Link href="/" className="auth-logo">𖦹UbuTube</Link>
-        <h1>Log in</h1>
-
         {searchParams.get("reset") && (
-          <p className="auth-message auth-message--success">
+          <p>
             ✓ Password updated — please log in with your new password.
           </p>
         )}
@@ -47,7 +43,7 @@ export default function LoginPage() {
           {error && <p className="auth-error">{error}</p>}
 
           <label>
-            Email
+            <div>Email</div>
             <input
               type="email" value={email} required autoComplete="email"
               onChange={e => setEmail(e.target.value)}
@@ -55,24 +51,23 @@ export default function LoginPage() {
           </label>
 
           <label>
-            Password
+            <div>Password</div>
             <input
               type="password" value={password} required autoComplete="current-password"
               onChange={e => setPassword(e.target.value)}
             />
           </label>
 
-          <Link href="/forgot-password" className="auth-link">Forgot password?</Link>
+        <Link href="/forgot-password" className="linkout ubu-linkout">Forgot password?</Link>
 
-          <button type="submit" className="auth-btn" disabled={loading}>
+          <button type="submit" className="ubu-linkout" disabled={loading}>
             {loading ? "Logging in…" : "Log in"}
           </button>
         </form>
+        <div>
+          No account? <button onClick={() => router.push("/signup")}>Sign up</button>
+        </div>
 
-        <p className="auth-switch">
-          No account? <Link href="/signup">Sign up</Link>
-        </p>
-      </div>
     </div>
   );
 }

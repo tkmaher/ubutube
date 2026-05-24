@@ -3,11 +3,39 @@
 .left-bar {
     height: $univHeight;
     display: flex;
-    gap: 0.2em;
     overflow-y: auto;
     min-width: 12dvw;
     flex-grow: 1;
     max-width: 12dvw;
     padding: 0.2em;
     flex-direction: column;
+    justify-content: space-between;
+    .footer {
+        max-width: 12dvw;
+
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.auth-page {
+    padding: 0.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+
+    height: $univHeight;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    label {
+        display: flex;
+        gap: 0.2em;
+        div {
+            width: 5em;
+        }
+    }
 }

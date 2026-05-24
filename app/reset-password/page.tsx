@@ -74,7 +74,6 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <Link href="/" className="auth-logo">𖦹UbuTube</Link>
         <Suspense fallback={<p className="auth-message">Loading…</p>}>
           <ResetContent />
         </Suspense>
