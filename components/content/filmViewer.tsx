@@ -1,10 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Film, FilmSimpler } from "@/types/objects"
 import Link from "next/link";
 import VideoStream from "./streamer";
 import { useRouter } from "next/navigation";
 import ReactLenis from "lenis/react";
+import Tooltip from "./tooltip";
+import { useAuth } from "@/context/AuthContext";
+import { modifyBookmark } from "@/lib/auth-client";
 
 function RecommendedFilm({src}: {src: FilmSimpler}) {
 
@@ -23,6 +26,35 @@ function RecommendedFilm({src}: {src: FilmSimpler}) {
     );
 }
 
+function VideoButton({ 
+    buttonText, 
+    text1, 
+    text2,
+    callback
+}: {
+    buttonText: string, 
+    text1: string, 
+    text2: string,
+    callback?: () => void
+}) {
+    const [useText1, setUseText1] = useState(true);
+
+    return (
+        <button className="tooltip-parent" 
+            onClick={() => {
+                setUseText1(false);
+                if (callback) callback();
+            }} 
+            onMouseOut={() => setUseText1(true)}
+        >
+            {buttonText}
+            <Tooltip 
+                text={useText1 ? text1 : text2}
+            />
+        </button>
+    )
+}
+
 export default function FilmViewer({
     slug,
     initialData,
@@ -32,12 +64,23 @@ export default function FilmViewer({
 }) {
     const decodedSlug = decodeURIComponent(slug);
 
+    const { bookmarks, setBookmarks } = useAuth();
+
+    const [isBookmarked, setIsBookmarked] = useState(false);
+
+    useEffect(() => {
+        if (bookmarks) {
+            setIsBookmarked(bookmarks.includes(slug));
+        }
+    }, [bookmarks, slug]);
+
     const [filmData, setFilmData] = useState<Film>(
         initialData ?? {
             name: "", artists: [""], description: "",
             year: "", ubuLink: "", src: "", bySameArtist: [], id: "",
         }
     );
+    const [views, setViews] = useState<number>(0);
     const [loading, setLoading] = useState(!initialData); // skip loading if we have data
     const [error, setError] = useState(false);
     const [vidIndexInQueue, setVidIndexInQueue] = useState(() => {
@@ -47,7 +90,16 @@ export default function FilmViewer({
     });
 
     useEffect(() => {
-        if (initialData) return; // data already provided by server — skip fetch
+        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}/views`)
+            .then(res => res.json())
+            .then((data: { views: number; success: boolean }) => {
+                if (data.success) setViews(data.views);
+            })
+            .catch(err => console.error("Fetch error:", err));
+    }, [slug]);
+    
+    useEffect(() => {
+        if (initialData) return;
         setLoading(true);
         fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}`)
             .then(res => res.json())
@@ -62,7 +114,7 @@ export default function FilmViewer({
             })
             .catch(err => console.error("Fetch error:", err))
             .finally(() => setLoading(false));
-    }, [slug]);  
+    }, [slug]);
 
     if (error) return (
         <div>
@@ -84,6 +136,21 @@ export default function FilmViewer({
         const newFilm = queue[newIndex];
         router.push(`/film/${newFilm.id}`);
     }
+
+    const bookmarkCallback = useCallback(() => {
+        if (!bookmarks) {
+            router.push('/login');
+            return;
+        }
+        const newBookmarks = bookmarks.includes(slug) ? bookmarks.filter(n => n != slug) : [...bookmarks, slug];
+        setBookmarks(newBookmarks);
+        modifyBookmark(bookmarks ? newBookmarks.join(",") : "");
+        setIsBookmarked(old => !old);
+    }, [bookmarks, slug, setBookmarks, router]);
+
+    const shareCallback = async () => {
+        await navigator.clipboard.writeText(`https://ubutube.org/film/${slug}`);
+    }
     
     return (
         <div className="content-container">
@@ -91,6 +158,26 @@ export default function FilmViewer({
             <div style={{opacity: loading ? 0 : 1}} className="content-columns">
                 <div className="content-left">
                     {filmData.src ? <VideoStream src={filmData.src}/>: "Error: no SRC found!"}
+                    <div className="viewer-title">
+                            <div>{filmData.name}</div>
+                            <div className="stats">
+                                <div>
+                                    {views} {views != 1 ? "views" : "view"}
+                                </div>
+                                <VideoButton
+                                    buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
+                                    text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
+                                    text2={isBookmarked ? "Added to bookmarks!" : "Removed from bookmarks!"}
+                                    callback={bookmarkCallback}
+                                />
+                                <VideoButton
+                                    buttonText="Share"
+                                    text1="Copy link"
+                                    text2="Link copied to clipboard!"
+                                    callback={shareCallback}
+                                />
+                            </div>
+                        </div>
                     <ReactLenis
                         className="content-desc"
                         style={{ opacity: loading ? 0 : 1 }}
@@ -100,26 +187,13 @@ export default function FilmViewer({
                             syncTouch: true,
                         }}
                     >
-                        <div className="viewer-title">
-                            <div>{filmData.name}</div>
-                            <div className="stats">
-                                <div>
-                                    1000 views
-                                </div>
-                                <button>
-                                    bookmark
-                                </button>
-                                <button>
-                                    share
-                                </button>
-                            </div>
-                        </div>
+                        
                         <div className="viewer-artists">
                             <div>{filmData.year}</div>
                             <div>{" - "}</div>
                             {filmData.artists.map((artist, i) => (
                                 <div className="tabs" key={artist}>
-                                    <Link href={`/artist/${artist}`} className="linkout">
+                                    <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
                                         {artist}{i != filmData.artists.length - 1 && ', '}
                                     </Link>
                                 </div>

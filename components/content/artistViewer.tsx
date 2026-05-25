@@ -20,16 +20,19 @@ function RecommendedFilm({src}: {src: FilmSimpler}) {
     );
 }
 
-export default function ArtistViewer({slug}: {slug: string}) {
+export default function ArtistViewer({slug, initialData}: {slug: string, initialData: Artist | null}) {
     const decodedSlug = decodeURIComponent(slug);
     
-    const [artistData, setArtistData] = useState<Artist>({
-        name: "",
-        description: "",
-        years: "",
-        ubuLink: "",
-        bySameArtist: [],
-    });
+    const [artistData, setArtistData] = useState<Artist>(
+        initialData ?? 
+        {
+            name: "",
+            description: "",
+            years: "",
+            ubuLink: "",
+            bySameArtist: [],
+        }
+    );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
 
@@ -66,24 +69,26 @@ export default function ArtistViewer({slug}: {slug: string}) {
         <div className="content-container">
             {loading && <div className="loader">Loading...</div>}
             <div style={{opacity: loading ? 0 : 1}} className="content-columns">
-                <ReactLenis
-                    className="content-left content-left-artists"
-                    data-lenis-prevent  
-                    options={{
-                        lerp: 0.1,      
-                        syncTouch: true,
-                    }}
-                >
-                    <div>{artistData.name}</div>
-                    <div>{artistData.years}</div>
-                    {artistData.description && 
-                        <div>{artistData.description}</div>
-                    }
-                    <br/>
-                    <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
-                        View on ubu.com
-                    </a>
-                </ReactLenis>
+                <div className="content-left content-left-artists">
+                    <div>{artistData.name} {artistData.years}</div>
+
+                    <ReactLenis
+                        className="content-left content-left-artists"
+                        data-lenis-prevent  
+                        options={{
+                            lerp: 0.1,      
+                            syncTouch: true,
+                        }}
+                    >
+                        {artistData.description && 
+                            <div>{artistData.description}</div>
+                        }
+                        <br/>
+                        <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
+                            View on ubu.com
+                        </a>
+                    </ReactLenis>
+                </div>
                 {artistData.bySameArtist.length > 0 && 
                     <div className="content-right content-recommended-artists">
                         <div>

@@ -32,6 +32,7 @@
         flex-basis: 50%;
         height: $univHeight;
         max-width: none !important;
+        overflow-y: auto;
     }
     .viewer-artists {
         display: flex;

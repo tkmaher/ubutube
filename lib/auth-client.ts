@@ -1,6 +1,6 @@
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ubu-worker.tomaszkkmaher.workers.dev";
 
-export type AuthUser = { id: string; username: string; email: string };
+export type AuthUser = { id: string; username: string; email: string; bookmarks: string };
 
 const call = async (path: string, init?: RequestInit) => {
   const res = await fetch(`${API}${path}`, {
@@ -38,3 +38,6 @@ export const resetPassword = (token: string, password: string) =>
 
 export const deleteAccount = (password: string) =>
   call("/api/auth/account", { method: "DELETE", body: JSON.stringify({ password }) });
+
+export const modifyBookmark = (bookmarks: string) =>
+  call("/api/auth/bookmark", { method: "POST", body: JSON.stringify({ bookmarks }) });

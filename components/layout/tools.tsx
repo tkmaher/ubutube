@@ -17,21 +17,37 @@ export default function Tools() {
 
   return (
     <div className="left-bar">
-      <Link className="linkout ubu-linkout" href="/">𖦹UbuTube</Link>
+        <div className="header">
+            <div className="tabs">
+                <Link className="linkout" href="/">𖦹UbuTube</Link>
+            </div>
+            <div className="tabs">
+                <Link className="linkout" href="/about">About</Link>
+            </div>
+            <div className="tabs">
+                <a href="" className="linkout">Report a bug!</a>
+            </div>
+        </div>
 
         <div className="footer">
+            
             {!loading && (
                 user ? (
                     <>
-                        <Link href={`/users/${encodedUsername}`} className="linkout ubu-linkout">{user.username}</Link> 
-                        <a  className="linkout ubu-linkout" onClick={handleLogout}>Log out</a>
+                        <div className="tabs">
+                            <Link href={`/users/${encodedUsername}`} className="linkout">{user.username}</Link> 
+                        </div>
+                        <div className="tabs">
+                            <a className="linkout" onClick={handleLogout}>Log out</a>
+                        </div>
                     </>
                 ) : (
-                <div>
+                <div className="tabs">
                     <Link href="/login" className="linkout">Log in</Link> / <Link href="/signup" className="linkout">Sign up</Link>
                 </div>
                 )
             )}
+
         </div>
     </div>
   );

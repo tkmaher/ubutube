@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { SearchResult, SearchTree, SearchTreeArtist, SearchTreeYear } from "@/types/search";
 import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
@@ -104,10 +103,6 @@ export default function Search() {
 
     return (
         <div className="right-bar">
-            {/*<div className="logo">
-                <Image src="/spirale.png" height={50} width={50} alt="UbuTube logo" />
-                <div>UbuTube</div>
-            </div>*/}
 
             <div className="search-form">
                 <form
@@ -130,7 +125,7 @@ export default function Search() {
 
                 <div className="search-row">
                     <button
-                        onClick={() =>
+                        onClick={() => 
                             setPriority(p => (p === "artist" ? "year" : "artist"))
                         }
                         className="sorter"
@@ -162,7 +157,6 @@ export default function Search() {
             <ReactLenis
                 className="search-column"
                 style={{ opacity: loading ? 0 : 1 }}
-                data-lenis-prevent  
                 options={{
                     lerp: 0.1,      
                     syncTouch: true,

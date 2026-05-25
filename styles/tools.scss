@@ -10,12 +10,14 @@
     padding: 0.2em;
     flex-direction: column;
     justify-content: space-between;
-    .footer {
+    .footer, .header {
         max-width: 12dvw;
 
         display: flex;
         flex-direction: column;
     }
+
+
 }
 
 .auth-page {

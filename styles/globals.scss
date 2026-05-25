@@ -68,6 +68,9 @@ button {
 
 .linkout {
   @include link-style;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-wrap: pretty;
 }
 
 @media (hover: hover) {
@@ -89,4 +92,21 @@ button {
   display: flex;
   align-self: center;
   align-items: center;
+}
+
+.tooltip-parent {
+  @media (hover: hover) {
+    &:hover .tooltip {
+      display: block;
+    }
+    
+  }
+
+  .tooltip {
+    display: none;
+    position: fixed;
+    background-color: $secondary;
+
+    z-index: 1000;
+  }
 }

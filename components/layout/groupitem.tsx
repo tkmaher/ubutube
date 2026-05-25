@@ -56,7 +56,7 @@ export function GroupItem(props: Props) {
             <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
                 {props.mode == "artist" ?
                     <Link 
-                        className="linkout" href={`/artist/${label}`}
+                        className="linkout" href={`/artist/${encodeURIComponent(label)}`}
                         onClick={e => e.stopPropagation()}
                     >
                         {label}
