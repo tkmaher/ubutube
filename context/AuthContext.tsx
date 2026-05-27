@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getMe().then(u => { 
       setUser(u); 
       setLoading(false); 
-      u && setBookmarks(u.bookmarks.split(','));
+      u && setBookmarks(u.bookmarks ? u.bookmarks.split(',') : []);
     });
   }, []);
 

@@ -329,8 +329,9 @@ function useVideoStream(src: string): UseVideoStreamReturn {
           await initMSE(el, ext);
           return;
         } catch (e) {
-          console.warn('[VideoStream] MSE failed, falling back to blob:', toErrorMessage(e));
-          flushCleanup(); // revoke any partial MediaSource blob URL
+          el.removeAttribute('src'); 
+          el.load();                 
+          flushCleanup();
         }
       }
 
@@ -353,6 +354,7 @@ function useVideoStream(src: string): UseVideoStreamReturn {
 
   return { videoRef, type, status, progress, forceIframe };
 }
+
 
 // ─── component ───────────────────────────────────────────────────────────────
 
@@ -396,6 +398,10 @@ export default function VideoStream({
 //     };
 //   }, []);
 
+  useEffect(() => {
+    setIsLoaded(false);
+  }, [src]);
+
   return (
     <div
       className={`vs-root ${className}`}
@@ -405,7 +411,7 @@ export default function VideoStream({
       {/* ── Loading overlay ──────────────────────────────────────────── */}
       {!isLoaded && (
         <div className="vs-overlay">
-            Buffering...
+            Loading...
         </div>
       )}
 

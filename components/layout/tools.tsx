@@ -29,7 +29,7 @@ export default function Tools() {
             </div>
         </div>
 
-        <div className="footer">
+        <div className="footer" style={{ opacity: loading ? 0 : 1}}>
             
             {!loading && (
                 user ? (

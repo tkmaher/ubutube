@@ -22,3 +22,24 @@ export interface Artist {
 	ubuLink: string,
 	bySameArtist: FilmSimpler[],
 }
+
+export interface User {
+	username: string,
+	created_at: string,
+	bookmarks: string[]
+}
+
+export interface UserRaw {
+	username: string,
+	created_at: string,
+	bookmarks: string
+}
+
+export interface Comment {
+	user_id: string,
+	user_username: string,
+	film_id: string,
+	film_name: string,
+	comment: string,
+	date: string
+}

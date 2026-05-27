@@ -102,7 +102,7 @@ export default function Search() {
     }, [searchResults, priority, reverse]);
 
     return (
-        <div className="right-bar">
+        <div className="right-bar" style={{ opacity: loading ? 0 : 1 }}>
 
             <div className="search-form">
                 <form

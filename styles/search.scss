@@ -9,6 +9,7 @@
   min-width: 15dvw;
   max-width: 15dvw;
   padding: 0.2em;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .logo {
@@ -84,6 +85,7 @@
   overflow-x: hidden;
   z-index: 3;
   transition: opacity 0.1s ease-in-out;
+  margin: 0.2em 0;
 }
 
 .search-form {
@@ -96,11 +98,16 @@
   display: flex;
   gap: 0.2em;
   justify-content: space-between;
+  flex-wrap: nowrap;
+
+  &:has(.sorter) {
+    flex-wrap: wrap;
+  }
 
   width: 100%;
 
   input[type="text"] {
-    flex-grow: 1;
+    width: 100%;
   }
 
   .orderer, .sorter {

@@ -37,6 +37,7 @@ export default function ArtistViewer({slug, initialData}: {slug: string, initial
     const [error, setError] = useState(false);
 
     useEffect(() => {
+        if (initialData) return; 
         setLoading(true);
         fetch(
             `https://ubu-worker.tomaszkkmaher.workers.dev/api/artists/${slug}`
@@ -50,20 +51,21 @@ export default function ArtistViewer({slug, initialData}: {slug: string, initial
             }) => {
                 if (data.success) setArtistData(data.artist);
                 else {
-                    console.error("Search API error:", data);
+                    console.error("Artist API error:", data);
                     setError(true);
                 }
             }
         )
-        .catch(err => console.error("Search fetch error:", err))
+        .catch(err => console.error("Artist fetch error:", err))
         .finally(() => setLoading(false));
     }, [slug]);
 
     if (error) return (
-        <div>
-            Error displaying content: {decodedSlug} not found!
+        <div className="about">
+            Artist {decodedSlug} not found!
         </div>
     );
+    
     
     return (
         <div className="content-container">
@@ -84,10 +86,11 @@ export default function ArtistViewer({slug, initialData}: {slug: string, initial
                             <div>{artistData.description}</div>
                         }
                         <br/>
-                        <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
-                            View on ubu.com
-                        </a>
+                        
                     </ReactLenis>
+                    <a href={`https://ubu.com/film/${artistData.ubuLink}`} target="_blank" className="linkout ubu-linkout">
+                        View on ubu.com
+                    </a>
                 </div>
                 {artistData.bySameArtist.length > 0 && 
                     <div className="content-right content-recommended-artists">
