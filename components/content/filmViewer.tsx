@@ -9,6 +9,7 @@ import Tooltip from "./tooltip";
 import { useAuth } from "@/context/AuthContext";
 import { modifyBookmark } from "@/lib/auth-client";
 import Comments from "./comments";
+import { revalidateUserCache } from "@/lib/actions";
 
 const lenisOptions = { lerp: 0.2, syncTouch: true };
 
@@ -122,7 +123,7 @@ export default function FilmViewer({
         router.push(`/film/${queue[newIndex].id}`);
     };
 
-    const bookmarkCallback = useCallback(() => {
+    const bookmarkCallback = useCallback(async () => {
         if (!user || !bookmarks) {
             router.push("/login");
             return;
@@ -131,8 +132,9 @@ export default function FilmViewer({
             ? bookmarks.filter(n => n !== bookmarkSlug)
             : [...bookmarks, bookmarkSlug];
         setBookmarks(newBookmarks);
-        modifyBookmark(newBookmarks.join(","));
         setIsBookmarked(old => !old);
+        await modifyBookmark(newBookmarks.join(","));
+        await revalidateUserCache(user.username);
     }, [bookmarks, bookmarkSlug, setBookmarks, router, user]);
 
     const shareCallback = async () => {
@@ -168,15 +170,20 @@ export default function FilmViewer({
                     </div>
 
                     <div className="viewer-artists">
-                        <div>{filmData.year}</div>
-                        <div>{" - "}</div>
-                        {filmData.artists.map((artist, i) => (
-                            <div className="tabs" key={artist}>
-                                <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
-                                    {artist}{i !== filmData.artists.length - 1 && ", "}
-                                </Link>
-                            </div>
-                        ))}
+                        <div className="viewer-desc-comments">
+                            <div>{filmData.year}</div>
+                            <div>{" - "}</div>
+                            {filmData.artists.map((artist, i) => (
+                                <div className="tabs" key={artist}>
+                                    <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
+                                        {artist}{i !== filmData.artists.length - 1 && ", "}
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="viewer-desc-comments">
+                            Comments
+                        </div>
                     </div>
 
                     <div className="viewer-desc-comments">
@@ -188,9 +195,7 @@ export default function FilmViewer({
                                 />
                             </ReactLenis>
                         }
-                        <ReactLenis className="content-desc" data-lenis-prevent options={lenisOptions}>
-                            <Comments filmId={filmData.id} />
-                        </ReactLenis>
+                        <Comments filmId={filmData.id} />
                     </div>
 
                     <a

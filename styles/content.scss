@@ -53,6 +53,12 @@
         gap: 0.2em;
     }
 
+    .viewer-comments {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
     .content-desc {
         flex: 1;        // each panel takes exactly 50%
         min-width: 0;
@@ -133,4 +139,13 @@
     height: 100%;
     object-fit: contain;
     transition: top 0.5s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.bookmark {
+    display: flex;
+    gap: 0.2em;
+    .tab1 {
+        margin-left: 2em;
+        padding-left: 0 !important;
+    }
 }

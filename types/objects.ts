@@ -36,7 +36,6 @@ export interface UserRaw {
 }
 
 export interface Comment {
-	user_id: string,
 	user_username: string,
 	film_id: string,
 	film_name: string,

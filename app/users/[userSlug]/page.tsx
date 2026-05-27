@@ -7,7 +7,8 @@ import UserViewer from "@/components/content/userViewer";
 
 const getUserData = cache(async (userSlug: string): Promise<User | null> => {
     const res = await fetch(
-        `https://ubu-worker.tomaszkkmaher.workers.dev/api/users/${userSlug}`
+        `https://ubu-worker.tomaszkkmaher.workers.dev/api/users/${userSlug}`,
+        { next: { tags: [`user-${userSlug}`] } }  // ← tag it
     );
     const data: { cached: boolean; user: UserRaw; success: boolean } = await res.json();
 

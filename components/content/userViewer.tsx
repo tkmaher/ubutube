@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { modifyBookmark } from "@/lib/auth-client";
+import { revalidateUserCache } from "@/lib/actions";
 
 
 function formatToMMDDYYYY(dateString: string) {
@@ -62,13 +63,15 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
         </div>
     );
 
-    const bookmarkCallback = (bookmarkSlug: string) => {
+    const bookmarkCallback = async (bookmarkSlug: string) => {
         if (!user || !bookmarks) return;
-        console.log("Bookmark callback triggered for slug:", bookmarkSlug);
-        const newBookmarks = currentBookmarks.includes(bookmarkSlug) ? bookmarks.filter(n => n != bookmarkSlug) : [...bookmarks, bookmarkSlug];
+        const newBookmarks = currentBookmarks.includes(bookmarkSlug)
+            ? currentBookmarks.filter(n => n !== bookmarkSlug) 
+            : [...currentBookmarks, bookmarkSlug];
         setBookmarks(newBookmarks);
         setCurrentBookmarks(newBookmarks);
-        modifyBookmark(newBookmarks.join(','));
+        await modifyBookmark(newBookmarks.join(','));
+        await revalidateUserCache(userData!.username);
     };
     
     return (
@@ -99,8 +102,8 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
                                         {currentBookmarks.map((bookmark, index) => {
                                             const [filmId, filmName] = bookmark.split('@');
                                             return (
-                                                <div key={index} className="tabs">
-                                                    <Link href={`/film/${filmId}`} className="linkout tab1">
+                                                <div key={index} className=" bookmark">
+                                                    <Link href={`/film/${filmId}`} className="linkout ubu-linkout tab1">
                                                         {filmName}
                                                     </Link>
                                                     {user?.username === userData.username && 
