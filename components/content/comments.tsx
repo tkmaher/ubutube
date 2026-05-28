@@ -1,22 +1,58 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Comment } from "@/types/objects";
 import ReactLenis from "lenis/react";
+import { useAuth } from "@/context/AuthContext";
+import { formatToMMDDYYYY } from "@/lib/utility"
 
 const lenisOptions = { lerp: 0.2, syncTouch: true };
 
-function CommentItem({ comment }: { comment: Comment }) {
+function CommentItem({
+    comment,
+    isOwn,
+    onDelete,
+}: {
+    comment: Comment;
+    isOwn: boolean;
+    onDelete: (date: string) => void;
+}) {
+    const [deleting, setDeleting] = useState(false);
+ 
+    const handleDelete = async () => {
+        if (!confirm("Delete this comment?")) return;
+        setDeleting(true);
+        await onDelete(comment.date);
+        setDeleting(false);
+    };
+ 
     return (
         <div className="comment-item">
-            <div><a className="linkout" href={`/users/${comment.user_username}`}>{comment.user_username}</a> - {comment.date}</div>
+            <div className="comment-meta">
+                <a className="linkout" href={`/users/${comment.user_username}`}>
+                    {comment.user_username}
+                </a>
+                {" — "}
+                {formatToMMDDYYYY(comment.date)}
+                {isOwn && (
+                    <button
+                        className="comment-delete"
+                        onClick={handleDelete}
+                        disabled={deleting}
+                        aria-label="Delete comment"
+                    >
+                        ×
+                    </button>
+                )}
+            </div>
             <div className="tab1">{comment.comment}</div>
         </div>
     );
 }
 
-export default function Comments({filmId}: {filmId: string}) {
+export default function Comments({filmId, filmName, addMode, flipMode}: {filmId: string, filmName: string, addMode: boolean, flipMode: () => void}) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [loaded, setLoaded] = useState(false);
+    const [currComment, setCurrComment] = useState("");
     useEffect(() => {
         async function fetchComments() {
             try {
@@ -38,22 +74,118 @@ export default function Comments({filmId}: {filmId: string}) {
 
     const style = { opacity: loaded ? 1 : 0, transition: "opacity 0.1s" };
 
-    return (
+    const { user } = useAuth();
 
-        <div className="content-desc">
-            <ReactLenis data-lenis-prevent options={lenisOptions} className="viewer-comments" style={style}>
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.SubmitEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        const wordCount = currComment.trim().split(/\s+/).filter(Boolean).length;
+        if (wordCount < 15) {
+            setError(`Please write at least 15 words.`);
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const res = await fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/auth/comments`, {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    film_id: filmId,
+                    film_name: filmName,
+                    comment: currComment.trim(),
+                }),
+            });
+
+            const data: { success?: boolean; error?: string; date?: string } =
+                await res.json();
+
+            if (!res.ok || !data.success) {
+                setError(data.error ?? "Failed to post comment.");
+            } else {
+                // Optimistically prepend the new comment
+                const newComment: Comment = {
+                    user_username: user?.username!,
+                    film_id: filmId,
+                    film_name: filmName,
+                    comment: currComment.trim(),
+                    date: data.date!,
+                };
+                setComments((prev) => [newComment, ...prev]);
+                setCurrComment("");
+            }
+        } catch {
+            setError("Network error. Please try again.");
+        } finally {
+            setSubmitting(false);
+            flipMode();
+        }
+    };
+
+    const handleDelete = useCallback(
+        async (date: string) => {
+            try {
+                const res = await fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/auth/comments`, {
+                    method: "DELETE",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ film_id: filmId, date }),
+                });
+ 
+                if (res.ok) {
+                    setComments((prev) =>
+                        prev.filter((c) => c.date !== date)
+                    );
+                } else {
+                    const data: { error?: string } = await res.json();
+                    console.error("Delete failed:", data.error);
+                }
+            } catch (err) {
+                console.error("Error deleting comment:", err);
+            }
+        },
+        [filmId]
+    );
+
+
+    return (
+        <>
+            {addMode ? 
+            <div className="content-desc">
+                <form onSubmit={handleSubmit}>
+                    <textarea 
+                        placeholder="Please help maintain the quality of our site. Comments must be relevant, thoughtful, and a minimum of 15 words long." 
+                        className="comment-input" 
+                        value={currComment}
+                        onChange={e => setCurrComment(e.target.value)}
+                        id="comment"
+                    />
+                    <button type="submit" className="comment-submit" disabled={submitting}>Submit</button>
+                    <div>{error}</div>
+                </form>
+            </div>
+            
+            : <ReactLenis data-lenis-prevent options={lenisOptions} className="viewer-comments content-desc" style={style}>
                 {comments.length === 0 ? (
                     <div>No comments yet.</div>
                 ) : (
                     comments.map((comment, index) => (
-                        <CommentItem key={index} comment={comment} />
+                        <CommentItem
+                            key={`${comment.user_username}-${comment.date}-${index}`}
+                            comment={comment}
+                            isOwn={user?.username === comment.user_username}
+                            onDelete={handleDelete}
+                        />
                     ))
                 )}
-            </ReactLenis>
-            <button>
-                New comment
-            </button>
-        </div>
+            </ReactLenis>}
+            
+        </>
         
     )
 }

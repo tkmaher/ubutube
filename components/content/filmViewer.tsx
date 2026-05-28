@@ -81,6 +81,8 @@ export default function FilmViewer({
         return i !== -1 ? i : 0;
     });
 
+    const [commenting, setCommenting] = useState(false);
+
     const bookmarkSlug = `${filmData.id}@${filmData.name}`;
 
     useEffect(() => {
@@ -172,7 +174,7 @@ export default function FilmViewer({
                     <div className="viewer-artists">
                         <div className="viewer-desc-comments">
                             <div>{filmData.year}</div>
-                            <div>{" - "}</div>
+                            <div>{"—"}</div>
                             {filmData.artists.map((artist, i) => (
                                 <div className="tabs" key={artist}>
                                     <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
@@ -181,8 +183,11 @@ export default function FilmViewer({
                                 </div>
                             ))}
                         </div>
-                        <div className="viewer-desc-comments">
+                        <div className="viewer-desc-comments comment-header">
                             Comments
+                            <button onClick={() => setCommenting(old => !old)}>
+                                {commenting ? "Back" : "Add comment..."}
+                            </button>
                         </div>
                     </div>
 
@@ -195,7 +200,12 @@ export default function FilmViewer({
                                 />
                             </ReactLenis>
                         }
-                        <Comments filmId={filmData.id} />
+                        <Comments 
+                            filmId={filmData.id} 
+                            filmName={filmData.name} 
+                            addMode={commenting}
+                            flipMode={() => setCommenting(old => !old)}
+                        />
                     </div>
 
                     <a

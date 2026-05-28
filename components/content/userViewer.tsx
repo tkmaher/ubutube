@@ -6,18 +6,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { modifyBookmark } from "@/lib/auth-client";
 import { revalidateUserCache } from "@/lib/actions";
-
-
-function formatToMMDDYYYY(dateString: string) {
-    const date = new Date(dateString.replace(' ', 'T')); // Standardize to ISO 8601
-    if (isNaN(date.getTime())) return null; // Invalid date check
-    
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const dd = String(date.getDate()).padStart(2, '0');
-    const yyyy = date.getFullYear();
-    
-    return `${mm}/${dd}/${yyyy}`;
-}
+import { formatToMMDDYYYY } from "@/lib/utility"
 
 export default function UserViewer({slug, initialData}: {slug: string, initialData: User | null}) {
     const decodedSlug = decodeURIComponent(slug);
@@ -79,7 +68,7 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
             {loading && <div className="loader">Loading...</div>}
             <div style={{opacity: loading ? 0 : 1}} className="content-columns">
                 <div className="content-left content-left-artists">
-                    <div>{userData?.username} - User since {userData && formatToMMDDYYYY(userData.created_at)}</div>
+                    <div>{userData?.username} — User since {userData && formatToMMDDYYYY(userData.created_at)}</div>
 
                     {currentBookmarks.length ? 
                         <div className="tabcontainer">

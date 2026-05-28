@@ -41,3 +41,9 @@ export const deleteAccount = (password: string) =>
 
 export const modifyBookmark = (bookmarks: string) =>
   call("/api/auth/bookmark", { method: "POST", body: JSON.stringify({ bookmarks }) });
+
+export const postComment = (film_id: string, film_name: string, comment: string) =>
+  call("/api/auth/comments", { method: "POST", body: JSON.stringify({ "film_id": film_id, "film_name": film_name, "comment": comment }) });
+
+export const deleteComment = (date: string, film_id: string) =>
+  call("/api/auth/comments", { method: "DELETE", body: JSON.stringify({ "date": date, "film_id": film_id }) });

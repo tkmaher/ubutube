@@ -53,6 +53,19 @@
         gap: 0.2em;
     }
 
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .comment-meta {
+        display: flex;
+        width: 100%;
+        gap: 0.2em;
+    }
+
     .viewer-comments {
         display: flex;
         flex-direction: column;
@@ -64,6 +77,19 @@
         min-width: 0;
         overflow-y: auto;
         overflow-x: hidden;
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+            align-items: flex-start;
+            textarea {
+                width: calc(100% - 0.4em) !important;
+                background: transparent;
+                font-family: $font !important;
+                font-size: 1em;
+                flex-grow: 1
+            }
+        }
     }
     // ─────────────────────────────────────────────────────────────
 
