@@ -14,7 +14,8 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
     const [userData, setUserData] = useState<User | null>(initialData);
     const [loading, setLoading] = useState(!initialData); // only loading if no SSR data
     const [error, setError] = useState(false);
-    const [collapsed, setCollapsed] = useState(true);
+    const [bCollapsed, setBCollapsed] = useState(false);
+    const [cCollapsed, setCCollapsed] = useState(false);
 
     const { user, bookmarks, setBookmarks } = useAuth();
     const [currentBookmarks, setCurrentBookmarks] = useState<string[]>(initialData?.bookmarks || []);
@@ -32,6 +33,7 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
                     setUserData({
                         ...data.user,
                         bookmarks: data.user.bookmarks ? data.user.bookmarks.split(',') : [],
+                        comments: data.user.comments ?? [],
                     });
                     setCurrentBookmarks(data.user.bookmarks ? data.user.bookmarks.split(',') : []);
                 } else {
@@ -62,6 +64,7 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
         await modifyBookmark(newBookmarks.join(','));
         await revalidateUserCache(userData!.username);
     };
+
     
     return (
         <div className="content-container">
@@ -72,16 +75,16 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
 
                     {currentBookmarks.length ? 
                         <div className="tabcontainer">
-                            <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
+                            <div className="tab0 tabs" onClick={() => setBCollapsed(c => !c)}>
                                 <a>Bookmarks</a>
                                 <div
                                     className="collapse-trigger"
                                 >
-                                    {collapsed ? "+" : "-"}
+                                    {bCollapsed ? "+" : "-"}
                                 </div>
                             </div>
                             <motion.div
-                                animate={{ height: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
+                                animate={{ height: bCollapsed ? 0 : "auto", opacity: bCollapsed ? 0 : 1 }}
                                 initial={false}
                                 transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
                                 style={{ overflow: "hidden" }}
@@ -95,6 +98,47 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
                                                     <Link href={`/film/${filmId}`} className="linkout ubu-linkout tab1">
                                                         {filmName}
                                                     </Link>
+                                                    {user?.username === userData.username && 
+                                                        <button onClick={() => bookmarkCallback(bookmark)}>
+                                                            Remove bookmark
+                                                        </button>
+                                                    }
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                }
+                            </motion.div>
+                        </div> :
+                        <div/>
+                    }
+
+                    {currentBookmarks.length ? 
+                        <div className="tabcontainer">
+                            <div className="tab0 tabs" onClick={() => setCCollapsed(c => !c)}>
+                                <a>Comments</a>
+                                <div
+                                    className="collapse-trigger"
+                                >
+                                    {cCollapsed ? "+" : "-"}
+                                </div>
+                            </div>
+                            <motion.div
+                                animate={{ height: cCollapsed ? 0 : "auto", opacity: cCollapsed ? 0 : 1 }}
+                                initial={false}
+                                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                                style={{ overflow: "hidden" }}
+                            >
+                                {(userData?.comments.length) && 
+                                    <div>
+                                        {userData.comments.map((commentIn, index) => {
+                                            const { film_name, film_id, comment, user_username } = commentIn;
+                                            return (
+                                                <div key={index} className=" comment">
+                                                    <Link href={`/film/${film_id}`} className="linkout ubu-linkout tab1">
+                                                        {film_name}
+                                                    </Link>
+                                                    {comment}
                                                     {user?.username === userData.username && 
                                                         <button onClick={() => bookmarkCallback(bookmark)}>
                                                             Remove bookmark

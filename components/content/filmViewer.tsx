@@ -83,6 +83,7 @@ export default function FilmViewer({
 
     const [commenting, setCommenting] = useState(false);
 
+
     const bookmarkSlug = `${filmData.id}@${filmData.name}`;
 
     useEffect(() => {
@@ -159,7 +160,7 @@ export default function FilmViewer({
                             <VideoButton
                                 buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
                                 text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
-                                text2={isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
+                                text2={!isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
                                 callback={bookmarkCallback}
                             />
                             <VideoButton
@@ -167,6 +168,12 @@ export default function FilmViewer({
                                 text1="Copy link"
                                 text2="Link copied to clipboard!"
                                 callback={shareCallback}
+                            />
+                            <VideoButton
+                                buttonText={!commenting ? "Comments" : "Description"}
+                                text1={!commenting ? "View comments" : "View description"}
+                                text2={!commenting ? "View comments" : "View description"}
+                                callback={() => setCommenting(prev => !prev)}
                             />
                         </div>
                     </div>
@@ -183,29 +190,28 @@ export default function FilmViewer({
                                 </div>
                             ))}
                         </div>
-                        <div className="viewer-desc-comments comment-header">
-                            Comments
-                            <button onClick={() => setCommenting(old => !old)}>
-                                {commenting ? "Back" : "Add comment..."}
-                            </button>
-                        </div>
+                        
                     </div>
 
                     <div className="viewer-desc-comments">
                         {filmData.description &&
                             <ReactLenis className="content-desc" data-lenis-prevent options={lenisOptions}>
-                                <div
+                                {!commenting ? <div
                                     className="viewer-description"
                                     dangerouslySetInnerHTML={{ __html: filmData.description }}
-                                />
+                                /> :
+                                <div className="comment-header">
+                                    Comments
+                                    
+                                    <Comments 
+                                        filmId={filmData.id} 
+                                        filmName={filmData.name} 
+                                    
+                                    />
+                                </div>}
                             </ReactLenis>
                         }
-                        <Comments 
-                            filmId={filmData.id} 
-                            filmName={filmData.name} 
-                            addMode={commenting}
-                            flipMode={() => setCommenting(old => !old)}
-                        />
+                        
                     </div>
 
                     <a

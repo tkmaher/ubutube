@@ -48,16 +48,13 @@
     // ── The key layout block ──────────────────────────────────────
     .viewer-desc-comments {
         display: flex;
-        flex: 1;        // grows to fill remaining vertical space in content-left
+        flex: 1;       
         min-height: 0;  // lets flex children shrink below their content size
         gap: 0.2em;
     }
 
     .comment-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-shrink: 0;
+       
     }
 
     .comment-meta {
@@ -147,7 +144,7 @@
 .vs-root {
     width: 100%;
     min-height: 10em;
-    flex-basis: 70%;
+    flex-basis: 55%;
     flex-shrink: 0;
 }
 
@@ -174,4 +171,9 @@
         margin-left: 2em;
         padding-left: 0 !important;
     }
+}
+
+.comment {
+    display: flex;
+    flex-direction: column;
 }

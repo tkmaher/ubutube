@@ -102,7 +102,7 @@ export default function Search() {
     }, [searchResults, priority, reverse]);
 
     return (
-        <div className="right-bar" style={{ opacity: loading ? 0 : 1 }}>
+        <div className="right-bar">
 
             <div className="search-form">
                 <form
@@ -192,12 +192,7 @@ export default function Search() {
                           )
                       )}
             </ReactLenis>
-            {loading && <div
-                className="loader"
-                style={{ opacity: loading ? 1 : 0 }}
-            >
-                {loading && "Loading..."}
-            </div>}
+
 
             
 

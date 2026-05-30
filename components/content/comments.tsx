@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Comment } from "@/types/objects";
 import ReactLenis from "lenis/react";
 import { useAuth } from "@/context/AuthContext";
@@ -49,7 +49,7 @@ function CommentItem({
     );
 }
 
-export default function Comments({filmId, filmName, addMode, flipMode}: {filmId: string, filmName: string, addMode: boolean, flipMode: () => void}) {
+export default function Comments({filmId, filmName}: {filmId: string, filmName: string}) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [currComment, setCurrComment] = useState("");
@@ -123,7 +123,6 @@ export default function Comments({filmId, filmName, addMode, flipMode}: {filmId:
             setError("Network error. Please try again.");
         } finally {
             setSubmitting(false);
-            flipMode();
         }
     };
 
@@ -155,7 +154,6 @@ export default function Comments({filmId, filmName, addMode, flipMode}: {filmId:
 
     return (
         <>
-            {addMode ? 
             <div className="content-desc">
                 <form onSubmit={handleSubmit}>
                     <textarea 
@@ -170,7 +168,7 @@ export default function Comments({filmId, filmName, addMode, flipMode}: {filmId:
                 </form>
             </div>
             
-            : <ReactLenis data-lenis-prevent options={lenisOptions} className="viewer-comments content-desc" style={style}>
+            <div className="viewer-comments content-desc" style={style}>
                 {comments.length === 0 ? (
                     <div>No comments yet.</div>
                 ) : (
@@ -183,7 +181,7 @@ export default function Comments({filmId, filmName, addMode, flipMode}: {filmId:
                         />
                     ))
                 )}
-            </ReactLenis>}
+            </div>
             
         </>
         

@@ -26,13 +26,15 @@ export interface Artist {
 export interface User {
 	username: string,
 	created_at: string,
-	bookmarks: string[]
+	bookmarks: string[],
+	comments: Comment[]
 }
 
 export interface UserRaw {
 	username: string,
 	created_at: string,
-	bookmarks: string
+	bookmarks: string,
+	comments: Comment[]
 }
 
 export interface Comment {
