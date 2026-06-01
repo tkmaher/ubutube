@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ubu-worker.tomaszkkmaher.workers.dev";
+const API = "https://ubu-worker.tomaszkkmaher.workers.dev";
 
 export type AuthUser = { id: string; username: string; email: string; bookmarks: string; link: string };
 
