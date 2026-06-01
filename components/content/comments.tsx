@@ -1,11 +1,8 @@
 "use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { Comment } from "@/types/objects";
-import ReactLenis from "lenis/react";
 import { useAuth } from "@/context/AuthContext";
 import { formatToMMDDYYYY } from "@/lib/utility"
-
-const lenisOptions = { lerp: 0.2, syncTouch: true };
 
 function CommentItem({
     comment,
@@ -33,18 +30,20 @@ function CommentItem({
                 </a>
                 {" — "}
                 {formatToMMDDYYYY(comment.date)}
+                
+            </div>
+            <div className="tab1">
+                {comment.comment}
                 {isOwn && (
                     <button
-                        className="comment-delete"
                         onClick={handleDelete}
                         disabled={deleting}
                         aria-label="Delete comment"
                     >
-                        ×
+                        Delete comment
                     </button>
                 )}
             </div>
-            <div className="tab1">{comment.comment}</div>
         </div>
     );
 }

@@ -1,7 +1,6 @@
 import { cache } from "react";
 import { Metadata } from "next";
 import { User, UserRaw } from "@/types/objects";
-import FilmViewer from "@/components/content/filmViewer"; 
 import "@/styles/content.scss";
 import UserViewer from "@/components/content/userViewer";
 

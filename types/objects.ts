@@ -27,6 +27,7 @@ export interface User {
 	username: string,
 	created_at: string,
 	bookmarks: string[],
+	link: string,
 	comments: Comment[]
 }
 
@@ -34,6 +35,7 @@ export interface UserRaw {
 	username: string,
 	created_at: string,
 	bookmarks: string,
+	link: string,
 	comments: Comment[]
 }
 

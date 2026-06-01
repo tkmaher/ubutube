@@ -1,6 +1,6 @@
 const API = process.env.NEXT_PUBLIC_API_URL ?? "https://ubu-worker.tomaszkkmaher.workers.dev";
 
-export type AuthUser = { id: string; username: string; email: string; bookmarks: string };
+export type AuthUser = { id: string; username: string; email: string; bookmarks: string; link: string };
 
 const call = async (path: string, init?: RequestInit) => {
   const res = await fetch(`${API}${path}`, {
@@ -47,3 +47,6 @@ export const postComment = (film_id: string, film_name: string, comment: string)
 
 export const deleteComment = (date: string, film_id: string) =>
   call("/api/auth/comments", { method: "DELETE", body: JSON.stringify({ "date": date, "film_id": film_id }) });
+
+export const editUser = ( link: string, username: string) => 
+  call("/api/auth/edit", { method: "POST", body: JSON.stringify({"link": link, "username": username }) });

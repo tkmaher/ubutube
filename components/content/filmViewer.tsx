@@ -80,11 +80,17 @@ export default function FilmViewer({
         const i = initialData.bySameArtist.findIndex(f => f.id === initialData.id);
         return i !== -1 ? i : 0;
     });
-
     const [commenting, setCommenting] = useState(false);
-
+    const [isMobile, setIsMobile] = useState(false);
 
     const bookmarkSlug = `${filmData.id}@${filmData.name}`;
+
+    useEffect(() => {
+        const mq = window.matchMedia("(max-width: 800px)");
+        setIsMobile(mq.matches);
+        mq.addEventListener("change", e => setIsMobile(e.matches));
+        return () => mq.removeEventListener("change", () => {});
+    }, []);
 
     useEffect(() => {
         if (bookmarks) setIsBookmarked(bookmarks.includes(bookmarkSlug));
@@ -146,102 +152,114 @@ export default function FilmViewer({
 
     if (error) return <div className="about">Film {decodedSlug} not found!</div>;
 
+    const leftContent = (
+        <>
+            {filmData.src ? <VideoStream src={filmData.src} /> : "Error: no SRC found!"}
+            <div className="viewer-title">
+                <div>{filmData.name}</div>
+                <div className="stats">
+                    <div>{views} {views !== 1 ? "views" : "view"}</div>
+                    <VideoButton
+                        buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
+                        text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
+                        text2={!isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
+                        callback={bookmarkCallback}
+                    />
+                    <VideoButton
+                        buttonText="Share"
+                        text1="Copy link"
+                        text2="Link copied to clipboard!"
+                        callback={shareCallback}
+                    />
+                    <VideoButton
+                        buttonText={!commenting ? "Comments" : "Description"}
+                        text1={!commenting ? "View comments" : "View description"}
+                        text2={!commenting ? "View comments" : "View description"}
+                        callback={() => setCommenting(prev => !prev)}
+                    />
+                </div>
+            </div>
+            <div className="viewer-artists">
+                <div className="viewer-desc-comments">
+                    <div>{filmData.year}</div>
+                    <div>{"—"}</div>
+                    {filmData.artists.map((artist, i) => (
+                        <div className="tabs" key={artist}>
+                            <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
+                                {artist}{i !== filmData.artists.length - 1 && ", "}
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className="viewer-desc-comments">
+                {filmData.description &&
+                    <div className="content-desc">
+                        {!commenting ? (
+                            <div
+                                className="viewer-description"
+                                dangerouslySetInnerHTML={{ __html: filmData.description }}
+                            />
+                        ) : (
+                            <div className="comment-header">
+                                Comments
+                                <Comments filmId={filmData.id} filmName={filmData.name} />
+                            </div>
+                        )}
+                    </div>
+                }
+            </div>
+        </>
+    );
+
+    const rightContent = filmData.bySameArtist.length > 1 && (
+        <>
+            <div>More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
+            {filmData.bySameArtist.map((rec, i) =>
+                i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
+            )}
+        </>
+    );
+
     return (
         <div className="content-container">
             {loading && <div className="loader">Loading...</div>}
             <div style={{ opacity: loading ? 0 : 1 }} className="content-columns">
-                <div className="content-left">
-                    {filmData.src ? <VideoStream src={filmData.src} /> : "Error: no SRC found!"}
-
-                    <div className="viewer-title">
-                        <div>{filmData.name}</div>
-                        <div className="stats">
-                            <div>{views} {views !== 1 ? "views" : "view"}</div>
-                            <VideoButton
-                                buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
-                                text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
-                                text2={!isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
-                                callback={bookmarkCallback}
-                            />
-                            <VideoButton
-                                buttonText="Share"
-                                text1="Copy link"
-                                text2="Link copied to clipboard!"
-                                callback={shareCallback}
-                            />
-                            <VideoButton
-                                buttonText={!commenting ? "Comments" : "Description"}
-                                text1={!commenting ? "View comments" : "View description"}
-                                text2={!commenting ? "View comments" : "View description"}
-                                callback={() => setCommenting(prev => !prev)}
-                            />
-                        </div>
+                {isMobile ? (
+                    <div className="content-left">
+                        {leftContent}
+                        {(rightContent && !commenting) && <div className="content-right">{rightContent}</div>}
                     </div>
-
-                    <div className="viewer-artists">
-                        <div className="viewer-desc-comments">
-                            <div>{filmData.year}</div>
-                            <div>{"—"}</div>
-                            {filmData.artists.map((artist, i) => (
-                                <div className="tabs" key={artist}>
-                                    <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
-                                        {artist}{i !== filmData.artists.length - 1 && ", "}
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                        
-                    </div>
-
-                    <div className="viewer-desc-comments">
-                        {filmData.description &&
-                            <ReactLenis className="content-desc" data-lenis-prevent options={lenisOptions}>
-                                {!commenting ? <div
-                                    className="viewer-description"
-                                    dangerouslySetInnerHTML={{ __html: filmData.description }}
-                                /> :
-                                <div className="comment-header">
-                                    Comments
-                                    
-                                    <Comments 
-                                        filmId={filmData.id} 
-                                        filmName={filmData.name} 
-                                    
-                                    />
-                                </div>}
-                            </ReactLenis>
-                        }
-                        
-                    </div>
-
-                    <a
-                        href={`https://ubu.com/film/${filmData.ubuLink}`}
-                        target="_blank"
-                        className="linkout ubu-linkout"
-                    >
-                        Watch on ubu.com
-                    </a>
-
-                    {filmData.bySameArtist.length > 1 && (
-                        <div className="nav-bar">
-                            <a onClick={() => nav("back")} className="linkout">Previous</a>
-                            <a onClick={() => nav("forward")} className="linkout">Next</a>
-                        </div>
-                    )}
-                </div>
-
-                {filmData.bySameArtist.length > 1 && (
-                    <div className="content-right">
-                        <div>More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
-                        <ReactLenis
-                            className="recommended-list"
-                            data-lenis-prevent
-                            options={lenisOptions}
-                        >
-                            {filmData.bySameArtist.map((rec, i) =>
-                                i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
-                            )}
+                ) : (
+                    <>
+                        <ReactLenis data-lenis-prevent options={lenisOptions} className="content-left">
+                            {leftContent}
                         </ReactLenis>
+                        {filmData.bySameArtist.length > 1 && (
+                            <div className="content-right">
+                                <div>More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
+                                <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
+                                    {filmData.bySameArtist.map((rec, i) =>
+                                        i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
+                                    )}
+                                </ReactLenis>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+            <div className="content-footer">
+                <a
+                    href={`https://ubu.com/film/${filmData.ubuLink}`}
+                    target="_blank"
+                    className="linkout ubu-linkout"
+                >
+                    Watch on ubu.com
+                </a>
+                {filmData.bySameArtist.length > 1 && (
+                    <div className="nav-bar">
+                        <a onClick={() => nav("back")} className="linkout">Previous</a>
+                        <a onClick={() => nav("forward")} className="linkout">Next</a>
                     </div>
                 )}
             </div>
