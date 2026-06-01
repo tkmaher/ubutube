@@ -4,6 +4,8 @@ import { User, UserRaw } from "@/types/objects";
 import "@/styles/content.scss";
 import UserViewer from "@/components/content/userViewer";
 
+
+
 const getUserData = cache(async (userSlug: string): Promise<User | null> => {
     const res = await fetch(
         `https://ubu-worker.tomaszkkmaher.workers.dev/api/users/${userSlug}`,

@@ -4,6 +4,8 @@ import { Film } from "@/types/objects";
 import FilmViewer from "@/components/content/filmViewer"; 
 import "@/styles/content.scss";
 
+
+
 const getFilmData = cache(async (filmSlug: string): Promise<Film | null> => {
     console.log("Film API response:", filmSlug);
     const res = await fetch(

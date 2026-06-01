@@ -4,6 +4,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { resetPassword } from "@/lib/auth-client";
 
+
+
 function ResetContent() {
   const token    = useSearchParams().get("token") ?? "";
   const router   = useRouter();
