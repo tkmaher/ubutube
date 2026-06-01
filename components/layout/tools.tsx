@@ -24,9 +24,7 @@ export default function Tools() {
             <div className="tabs">
                 <Link className="linkout" href="/about">About</Link>
             </div>
-            <div className="tabs">
-                <a href="" className="linkout">Report a bug!</a>
-            </div>
+
         </div>
 
         <div className="footer" style={{ opacity: loading ? 0 : 1}}>
@@ -47,6 +45,9 @@ export default function Tools() {
                 </div>
                 )
             )}
+            <div className="tabs">
+                <a href="" className="linkout">Report a bug!</a>
+            </div>
 
         </div>
     </div>
