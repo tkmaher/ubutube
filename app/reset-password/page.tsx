@@ -33,7 +33,6 @@ function ResetContent() {
   if (!token) {
     return (
       <>
-        <h1>Reset password</h1>
         <p className="auth-error">Invalid or missing reset link.</p>
         <Link href="/forgot-password" className="auth-link">Request a new one</Link>
       </>
@@ -42,7 +41,6 @@ function ResetContent() {
 
   return (
     <>
-      <h1>Reset password</h1>
       <form onSubmit={handleSubmit} className="auth-form">
         {error && <p className="auth-error">{error}</p>}
 
@@ -64,7 +62,7 @@ function ResetContent() {
           />
         </label>
 
-        <button type="submit" className="auth-btn" disabled={loading}>
+        <button type="submit" className="auth-btn ubu-linkout" disabled={loading}>
           {loading ? "Resetting…" : "Set new password"}
         </button>
       </form>
