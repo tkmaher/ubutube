@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "@/styles/globals.scss";
 import "@/styles/search.scss";
-import Search from "@/components/layout/search";
 import { AuthProvider } from "@/context/AuthContext";
-import Tools from "@/components/layout/tools";
 
 import { staticMetadata } from "./metadata";
+import Columns from "@/components/layout/main";
 
 export const metadata: Metadata = staticMetadata;
 
@@ -18,9 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
           <AuthProvider>
-            <Tools/>
-            <div className="main">{children}</div>
-            <Search/>
+            <Columns children={children}/>
           </AuthProvider>
       </body>
     </html>

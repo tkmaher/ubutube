@@ -1,5 +1,5 @@
 'use client';
-
+import "@/styles/video-player.scss";
 /**
  * VideoStream — Next.js client component
  *
@@ -29,6 +29,7 @@ type CastState  = 'NO_DEVICES_AVAILABLE' | 'NOT_CONNECTED' | 'CONNECTING' | 'CON
 
 export interface VideoStreamProps {
   src:          string;
+  ubuLink:      string;
   poster?:      string;
   autoPlay?:    boolean;
   muted?:       boolean;
@@ -549,7 +550,7 @@ function VideoControls({ videoRef, containerRef, ready, visible, castState, cast
 
 // ─── VideoStream ──────────────────────────────────────────────────────────────
 export default function VideoStream({
-  src, poster, autoPlay = false, muted = false, loop = false,
+  src, ubuLink, poster, autoPlay = false, muted = false, loop = false,
   className = '', aspectRatio = '16/9',
 }: VideoStreamProps) {
   const { videoRef, type, ready, error } = useVideoStream(src);
@@ -606,7 +607,13 @@ export default function VideoStream({
                         background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.45)',
                         fontSize: 12, letterSpacing: '0.07em', fontFamily: 'monospace',
                         pointerEvents: 'none' }}>
-            {error ? 'Playback error' : 'Loading…'}
+            {error ? 
+              <div style={{pointerEvents: 'auto'}}>
+                {`Playback error. `}
+                <a href={`https://ubu.com/film/${ubuLink}`} className='watch-link' target='_blank'>Watch on ubu.com</a>
+              </div> : 
+              'Loading…'
+            }
           </div>
         )}
 

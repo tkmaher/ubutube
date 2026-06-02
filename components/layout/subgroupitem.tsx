@@ -32,7 +32,7 @@ export function SubGroupItem({ label, films, mode, query }: Props) {
             <div className="tab1 tabs" onClick={() => setCollapsed(c => !c)}>
                 {mode != "artist" ?
                     <Link 
-                        className="linkout" href={`/artist/${encodeURIComponent(label)}`}
+                        className="linkout" href={`/artist/${encodeURIComponent(encodeURIComponent(label))}`}
                         onClick={e => e.stopPropagation()}
                     >
                         {label}

@@ -12,8 +12,11 @@ body {
   width: 100vw;
   overflow-x: hidden;
   margin: 0;
-  display: flex;
   font-size: 16px;
+}
+
+.appcontainer {
+  display: flex;
 }
 
 a, a:visited, a:hover, a:active {
@@ -82,9 +85,17 @@ button {
     background-color: $background;
   }
 
-  .ubu-linkout {
-    width: fit-content;
-  }
+
+}
+
+.ubu-linkout {
+  width: fit-content;
+}
+
+
+
+.spiral {
+  display: inline-block;
 }
 
 .loader {

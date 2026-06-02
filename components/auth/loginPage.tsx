@@ -23,7 +23,7 @@ export default function LoginPage() {
     try {
       const user = await login(email, password);
       setUser(user);
-      router.push("/");
+      router.back();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

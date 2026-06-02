@@ -1,0 +1,30 @@
+.vs-root {
+    width: 100%;
+    min-height: 10em;
+    flex-basis: 55%;
+    flex-shrink: 0;
+    margin-bottom: 0.2em;
+}
+
+.vs-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.vs-media {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: top 0.5s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.watch-link {
+    color: rgba(255,255,255,0.45) !important;
+    &:hover {
+        text-decoration: underline;
+    }
+}

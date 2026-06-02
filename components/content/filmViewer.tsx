@@ -154,7 +154,7 @@ export default function FilmViewer({
 
     const leftContent = (
         <>
-            {filmData.src ? <VideoStream src={filmData.src} /> : "Error: no SRC found!"}
+            {filmData.src ? <VideoStream src={filmData.src} ubuLink={filmData.ubuLink} /> : "Error: no SRC found!"}
             <div className="viewer-title">
                 <div>{filmData.name}</div>
                 <div className="stats">
@@ -185,7 +185,7 @@ export default function FilmViewer({
                     <div>{"—"}</div>
                     {filmData.artists.map((artist, i) => (
                         <div className="tabs" key={artist}>
-                            <Link href={`/artist/${encodeURIComponent(artist)}`} className="linkout">
+                            <Link href={`/artist/${encodeURIComponent(encodeURIComponent(artist))}`} className="linkout">
                                 {artist}{i !== filmData.artists.length - 1 && ", "}
                             </Link>
                         </div>

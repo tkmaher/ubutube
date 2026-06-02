@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { Comment } from "@/types/objects";
 import { useAuth } from "@/context/AuthContext";
 import { formatToMMDDYYYY } from "@/lib/utility"
+import { useRouter } from "next/navigation";
 
 function CommentItem({
     comment,
@@ -78,8 +79,14 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const router = useRouter();
+
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
+        if (!user) {
+            router.push("/login");
+            return;
+        }
         setError(null);
 
         const wordCount = currComment.trim().split(/\s+/).filter(Boolean).length;

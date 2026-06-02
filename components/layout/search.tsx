@@ -3,6 +3,7 @@ import { SearchResult, SearchTree, SearchTreeArtist, SearchTreeYear } from "@/ty
 import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
 import { ReactLenis } from 'lenis/react'
+import { useRouter } from "next/navigation";
 
 const PER_PAGE = 50;
 
@@ -69,6 +70,8 @@ export default function Search() {
 
     const [page, setPage] = useState(0);
 
+    const router = useRouter();
+
     useEffect(() => {
         setLoading(true);
         fetch(
@@ -121,6 +124,16 @@ export default function Search() {
                         aria-label="search input"
                     />
                     <button type="submit">→</button>
+                    <button onClick={() => {
+                        const randomFilm = rawResults[Math.floor(Math.random() * rawResults.length)];
+                        router.push(`/film/${randomFilm.id}`);
+                    }}
+                        type="button"
+                        className="random-button"
+                        aria-label="Random film"
+                    >
+                        ?
+                    </button>
                 </form>
 
                 <div className="search-row">
@@ -193,9 +206,6 @@ export default function Search() {
                       )}
             </ReactLenis>
 
-
-            
-
             <div className="search-form">
                 <div className="search-row">
                     <button
@@ -223,6 +233,7 @@ export default function Search() {
                         →
                     </button>
                 </div>
+                
             </div>
         </div>
     );

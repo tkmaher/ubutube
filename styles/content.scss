@@ -52,6 +52,8 @@
                 font-family: $font !important;
             }
         }
+
+
     }
 
     .viewer-artists {
@@ -150,32 +152,16 @@
             overflow: visible;
             flex: none;
         }
+
+        .viewer-title {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2em;
+        }
     }
 }
 
-.vs-root {
-    width: 100%;
-    min-height: 10em;
-    flex-basis: 55%;
-    flex-shrink: 0;
-    margin-bottom: 0.2em;
-}
 
-.vs-overlay {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}
-
-.vs-media {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: top 0.5s ease-in-out, opacity 0.3s ease-in-out;
-}
 
 .bookmarks-viewer {
     display: flex;
@@ -191,7 +177,14 @@
         padding-left: 0 !important;
     }
     button {
+        opacity: 0;
         margin-left: 0.2em;
+        transition: opacity 0.1s ease-in-out;
+    }
+    &:hover {
+        button {
+            opacity: 1;
+        }
     }
 }
 

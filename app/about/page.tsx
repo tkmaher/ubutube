@@ -4,7 +4,6 @@ export const metadata: Metadata = {
     title: "About",
 };
 
-
 export default function Page() {
     return (
         <div className="about">
@@ -19,7 +18,21 @@ export default function Page() {
                 UbuTube currently supports account creation, film bookmarking, and commenting. Please keep your activities respectful and intentional.
             </div>
             <br/>
-            <em>Built by <a href="https://otherseas1.com" className="linkout" target="_blank">otherseas1</a></em>
+            <div className="tab1">
+                <a href="mailto:admin@ubutube.org" target="_blank" className="linkout">
+                    Contact us
+                </a>
+            </div>
+            <div className="tab1">
+                <a href="mailto:bugreport@ubutube.org" target="_blank" className="linkout">
+                    Report a bug!
+                </a>
+            </div>  
+            <br/>
+            <div className="tab2">
+                Built by <a href="https://otherseas1.com" className="linkout" target="_blank">otherseas1</a>
+            </div>
+
         </div>
     )
 }

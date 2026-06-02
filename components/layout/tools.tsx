@@ -11,7 +11,6 @@ export default function Tools() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/");
     router.refresh();
   };
 
@@ -19,7 +18,7 @@ export default function Tools() {
     <div className="left-bar">
         <div className="header">
             <div className="tabs">
-                <Link className="linkout" href="/">𖦹UbuTube</Link>
+                <Link className="linkout" href="/"><div className="spiral">𖦹</div>UbuTube</Link>
             </div>
             <div className="tabs">
                 <Link className="linkout" href="/about">About</Link>
@@ -41,12 +40,19 @@ export default function Tools() {
                     </>
                 ) : (
                 <div className="tabs">
-                    <Link href="/login" className="linkout">Log in</Link> / <Link href="/signup" className="linkout">Sign up</Link>
+                    <Link href="/login" className="linkout">Log in</Link>/<Link href="/signup" className="linkout">Sign up</Link>
                 </div>
                 )
             )}
             <div className="tabs">
-                <a href="" className="linkout">Report a bug!</a>
+                <a href="mailto:admin@ubutube.org" target="_blank" className="linkout">
+                    Contact us
+                </a>
+            </div>
+            <div className="tabs">
+                <a href="mailto:bugreport@ubutube.org" target="_blank" className="linkout">
+                    Report a bug!
+                </a>
             </div>
 
         </div>

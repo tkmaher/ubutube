@@ -118,7 +118,7 @@ function BookmarkDisplay({ currentBookmarks, setCurrentBookmarks, userData }: {
                         {currentBookmarks.map((bookmark, index) => {
                             const [filmId, filmName] = bookmark.split('@');
                             return (
-                                <div key={index} className=" bookmark">
+                                <div key={index} className="bookmark">
                                     <Link href={`/film/${filmId}`} className="linkout ubu-linkout tab1">
                                         {filmName}
                                     </Link>
@@ -194,7 +194,7 @@ function CommentDisplay({ userData, setUserData }: { userData: User, setUserData
                         {userData.comments.map((commentIn, index) => {
                             const { film_name, film_id, comment, date } = commentIn;
                             return (
-                                <div key={index} className=" comment">
+                                <div key={index} className="comment">
                                     <div className="tab1">
                                         {`On `}
                                         <Link href={`/film/${film_id}`} className="linkout ubu-linkout">
