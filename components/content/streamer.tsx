@@ -1,5 +1,6 @@
 'use client';
 import "@/styles/video-player.scss";
+
 /**
  * VideoStream — Next.js client component
  *
@@ -127,14 +128,6 @@ function useChromecast(src: string) {
 }
 
 // ─── useVideoStream ───────────────────────────────────────────────────────────
-// Single source of truth: `ready` means the player UI should be shown and
-// controls should work. It becomes true when:
-//   - iframe: immediately (the iframe handles its own loading)
-//   - hls.js: on MANIFEST_PARSED (hls.js is attached and fetching segments)
-//   - native video: on 'canplay' (browser has buffered enough to start)
-//
-// We do NOT gate on `loadeddata` because for HLS that requires a play() call
-// first, which we can't guarantee (autoPlay may be false).
 function useVideoStream(src: string) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef   = useRef<import('hls.js').default | null>(null);
@@ -146,7 +139,6 @@ function useVideoStream(src: string) {
   useLayoutEffect(() => {
     if (!src) return;
 
-    // ── tear down previous instance ──────────────────────────────────────
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
     const detected = detectType(src);
@@ -154,15 +146,11 @@ function useVideoStream(src: string) {
     setReady(false);
     setError(false);
 
-    // iframes manage themselves
     if (detected === 'iframe') { setReady(true); return; }
 
     const el = videoRef.current;
     if (!el) { console.warn('[VideoStream] videoRef.current is null'); return; }
 
-    // Reset the element cleanly. We deliberately do NOT attach any error
-    // listener until after load() completes — load() itself fires an abort
-    // error if a previous src was set, which would falsely trigger setError.
     el.pause();
     el.removeAttribute('src');
     el.load();
@@ -170,55 +158,39 @@ function useVideoStream(src: string) {
     let cancelled = false;
 
     if (detected === 'hls') {
-      // ── Safari: native HLS ──────────────────────────────────────────────
-      if (el.canPlayType('application/vnd.apple.mpegurl')) {
-        el.src = src;
-        const onCanPlay = () => { if (!cancelled) setReady(true); };
-        const onError   = () => { if (!cancelled) { console.warn('[VideoStream] Safari HLS error'); setError(true); } };
-        el.addEventListener('canplay', onCanPlay, { once: true });
-        el.addEventListener('error',   onError,   { once: true });
-        return () => {
-          cancelled = true;
-          el.removeEventListener('canplay', onCanPlay);
-          el.removeEventListener('error',   onError);
-        };
-      }
+      import('hls.js').then(({ default: Hls }) => {
+        if (cancelled) return;
 
-      // ── Chrome/Firefox: hls.js ──────────────────────────────────────────
-      // MANIFEST_PARSED is the correct ready signal for hls.js — it fires
-      // as soon as the playlist is parsed and segment fetching has started,
-      // regardless of whether autoPlay is on. Do NOT wait for 'canplay' here;
-      // hls.js drives the media element via MSE and canplay only fires once
-      // the browser has decoded a frame, which requires play() to be called.
-      (async () => {
-        try {
-          const { default: Hls } = await import('hls.js');
-          if (cancelled) return;
-          if (!Hls.isSupported()) {
-            console.warn('[VideoStream] hls.js not supported in this browser');
-            setError(true); return;
-          }
-          const hls = new Hls({ enableWorker: true, backBufferLength: 60, maxBufferLength: 30 });
+        if (Hls.isSupported()) {
+          const hls = new Hls({ enableWorker: true, lowLatencyMode: false });
           hlsRef.current = hls;
-          hls.on(Hls.Events.MANIFEST_PARSED, () => { if (!cancelled) setReady(true); });
-          hls.on(Hls.Events.ERROR, (_e, d) => {
-            if (d.fatal && !cancelled) {
-              console.warn('[VideoStream] HLS fatal error:', d.type, d.details);
+          hls.loadSource(src);
+          hls.attachMedia(el);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (!cancelled) setReady(true);
+          });
+          hls.on(Hls.Events.ERROR, (_evt, data) => {
+            if (!cancelled && data.fatal) {
+              console.warn('[VideoStream] hls.js fatal error', data);
               setError(true);
             }
           });
-          hls.loadSource(src);
-          hls.attachMedia(el);
-        } catch (e) {
-          if (!cancelled) { console.warn('[VideoStream] HLS init threw:', toErr(e)); setError(true); }
+        } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
+          // Safari native HLS
+          el.src = src;
+          const onCanPlay = () => { if (!cancelled) setReady(true); };
+          const onError   = () => { if (!cancelled) { console.warn('[VideoStream] native HLS error', el.error); setError(true); } };
+          el.addEventListener('canplay', onCanPlay, { once: true });
+          Promise.resolve().then(() => {
+            if (!cancelled) el.addEventListener('error', onError, { once: true });
+          });
+          if (el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) setReady(true);
+        } else {
+          if (!cancelled) setError(true);
         }
-      })();
-
+      });
     } else {
       // ── Native video (MP4, WebM, etc.) ──────────────────────────────────
-      // Wait for canplay so we don't flash the element before it has a frame.
-      // The error listener is deferred by one microtask so it doesn't catch
-      // the abort event that el.load() fires when clearing a previous src.
       el.src = src;
       const onCanPlay = () => { if (!cancelled) setReady(true); };
       const onError   = () => { if (!cancelled) { console.warn('[VideoStream] video error', el.error); setError(true); } };
@@ -226,7 +198,6 @@ function useVideoStream(src: string) {
       Promise.resolve().then(() => {
         if (!cancelled) el.addEventListener('error', onError, { once: true });
       });
-      // Already buffered enough (e.g. navigating back to a cached video)?
       if (el.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) setReady(true);
     }
 
@@ -271,7 +242,6 @@ function useVideoControls(
     el.addEventListener('waiting',        onWait);
     el.addEventListener('playing',        onPlaying);
     el.addEventListener('seeked',         onSeeked);
-    // Sync initial state
     setPlaying(!el.paused);
     setCurrentTime(el.currentTime);
     setDuration(isFinite(el.duration) ? el.duration : 0);
@@ -486,12 +456,10 @@ function VideoControls({ videoRef, containerRef, ready, visible, castState, cast
   const castOn      = castState === 'CONNECTED';
   const castPulsing = castState === 'CONNECTING';
 
-  // All hooks above this line — conditional return is safe here.
   if (!ready) return null;
 
   return (
     <>
-      {/* buffering spinner overlay — shown while playing but stalled */}
       {buffering && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 4, display: 'flex',
                       alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
@@ -500,19 +468,15 @@ function VideoControls({ videoRef, containerRef, ready, visible, castState, cast
         </div>
       )}
 
-      {/* click-to-play overlay */}
       <div onClick={togglePlay}
            style={{ position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 1 }}
            aria-hidden />
 
-      {/* controls */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none',
                     display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', zIndex: 2 }}>
-        {/* gradient scrim */}
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%',
                       background: 'linear-gradient(to top, rgba(0,0,0,0.78) 0%, transparent 100%)',
                       opacity: visible ? 1 : 0, transition: 'opacity 0.3s', pointerEvents: 'none' }} />
-        {/* control row */}
         <div style={{ position: 'relative', padding: '0 10px 10px',
                       display: 'flex', flexDirection: 'column', gap: 1,
                       opacity: visible ? 1 : 0,
@@ -558,7 +522,6 @@ export default function VideoStream({
 
   const isIframe = type === 'iframe';
 
-  // playing mirror — for controls-visibility only, not for controls state
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     const el = videoRef.current; if (!el) return;
@@ -600,30 +563,28 @@ export default function VideoStream({
            style={{ aspectRatio, position: 'relative', background: '#000',
                     borderRadius: 'inherit', overflow: 'hidden' }}>
 
-        {/* loading overlay — shown until ready or on error */}
         {(!ready || error) && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 5,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.45)',
                         fontSize: 12, letterSpacing: '0.07em', fontFamily: 'monospace',
                         pointerEvents: 'none' }}>
-            {error ? 
+            {error ?
               <div style={{pointerEvents: 'auto'}}>
                 {`Playback error. `}
                 <a href={`https://ubu.com/film/${ubuLink}`} className='watch-link' target='_blank'>Watch on ubu.com</a>
-              </div> : 
+              </div> :
               'Loading…'
             }
           </div>
         )}
 
-        {/* <video> is always in the DOM so videoRef is never null during init */}
         <video ref={videoRef}
           style={{
             position: 'absolute', inset: 0,
             width:   isIframe ? 0 : '100%',
             height:  isIframe ? 0 : '100%',
-            opacity: (ready && !isIframe) ? 1 : 0,
+            opacity: 1,
             transition: 'opacity 0.2s',
             visibility: isIframe ? 'hidden' : 'visible',
           }}
