@@ -1,23 +1,30 @@
 @use "variables" as *;
 
+
 .left-bar {
-    height: $univHeight;
     display: flex;
-    overflow-y: auto;
-    min-width: 12dvw;
-    flex-grow: 1;
-    max-width: 12dvw;
-    padding: 0.2em;
     flex-direction: column;
     justify-content: space-between;
-    .footer, .header {
-        max-width: 12dvw;
+    box-sizing: border-box;
+    overflow-y: auto;
 
-        display: flex;
-        flex-direction: column;
+    .left-bar {
+        padding: 0.2em;
+        height: 100dvh;
     }
+  
+    @media (min-width: 801px) {
+      min-width: 12dvw;
+      max-width: 12dvw;
+    }
+  
+    .footer, .header {
+      display: flex;
+      flex-direction: column;
+    }
+  
     .footer {
-        transition: opacity 0.1s ease-in-out;
+      transition: opacity 0.1s ease-in-out;
     }
 }
 

@@ -25,7 +25,7 @@ declare global {
 type CastAny = any;
 
 // ─── types ────────────────────────────────────────────────────────────────────
-type SourceType = 'iframe' | 'hls' | 'video';
+type SourceType = 'iframe' | 'hls' | 'video' | 'unsupported';
 type CastState  = 'NO_DEVICES_AVAILABLE' | 'NOT_CONNECTED' | 'CONNECTING' | 'CONNECTED';
 
 export interface VideoStreamProps {
@@ -58,11 +58,14 @@ function getHost(src: string): string {
 }
 function plainMime(src: string): string { return MIME_MAP[getExt(src)] ?? 'video/mp4'; }
 
+const UNSUPPORTED_EXTS = new Set(['avi', 'mkv', 'mov', 'wmv', 'flv']);
+
 function detectType(src: string): SourceType {
   if (!src) return 'video';
   const host = getHost(src);
   if (host && !host.endsWith('ubu.com') && !host.endsWith('ubu-mirror.ch')) return 'iframe';
   const ext = getExt(src);
+  if (UNSUPPORTED_EXTS.has(ext)) return 'unsupported';
   if (ext === 'm3u8') return 'hls';
   if (VIDEO_EXTS.has(ext)) return 'video';
   return 'iframe';
@@ -146,7 +149,7 @@ function useVideoStream(src: string) {
     setReady(false);
     setError(false);
 
-    if (detected === 'iframe') { setReady(true); return; }
+    if (detected === 'iframe' || detected === 'unsupported') { setReady(true); return; }
 
     const el = videoRef.current;
     if (!el) { console.warn('[VideoStream] videoRef.current is null'); return; }
@@ -520,7 +523,8 @@ export default function VideoStream({
   const { videoRef, type, ready, error } = useVideoStream(src);
   const { castState, castReady, requestCast } = useChromecast(src);
 
-  const isIframe = type === 'iframe';
+  const isIframe      = type === 'iframe';
+  const isUnsupported = type === 'unsupported';  
 
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
@@ -563,7 +567,7 @@ export default function VideoStream({
            style={{ aspectRatio, position: 'relative', background: '#000',
                     borderRadius: 'inherit', overflow: 'hidden' }}>
 
-        {(!ready || error) && (
+        {(!ready || error) && !isUnsupported && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 5,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.45)',
@@ -571,11 +575,30 @@ export default function VideoStream({
                         pointerEvents: 'none' }}>
             {error ?
               <div style={{pointerEvents: 'auto'}}>
-                {`Playback error. `}
+                <span>Playback error :/</span>
                 <a href={`https://ubu.com/film/${ubuLink}`} className='watch-link' target='_blank'>Watch on ubu.com</a>
               </div> :
               'Loading…'
             }
+          </div>
+        )}
+
+        {isUnsupported && (
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 5,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 10, background: 'rgba(0,0,0,0.82)',
+            color: 'rgba(255,255,255,0.65)', fontSize: 12,
+            fontFamily: 'monospace', letterSpacing: '0.07em', textAlign: 'center', padding: '0 20px',
+          }}>
+            <span>This format can't be played in the browser :/</span>
+            <a href={src} download
+              style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.textDecoration = 'underline')}
+              onMouseLeave={e => (e.currentTarget.style.textDecoration = 'none')}
+            >
+              Download file
+            </a>
           </div>
         )}
 

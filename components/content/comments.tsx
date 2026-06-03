@@ -60,7 +60,6 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
                     `https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${filmId}/comments`
                 );
                 const data: { cached: boolean; comments: Comment[]; success: boolean } = await res.json();
-                console.log("Comments API response:", data);
                 if (data.success) setComments(data.comments);
                 else console.error("Comments API error:", data);
             } catch (error) {

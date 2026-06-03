@@ -17,6 +17,8 @@ body {
 
 .appcontainer {
   display: flex;
+  overflow: hidden;
+  max-height: 100dvh;
 }
 
 a, a:visited, a:hover, a:active {
@@ -123,5 +125,51 @@ button {
     background-color: $secondary;
 
     z-index: 1000;
+  }
+}
+
+.column-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .panel-tab {
+    display: none;
+  }
+
+  .panel-content {
+    flex: 1;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 800px) {
+  .appcontainer {
+    height: 100dvh;
+  }
+
+  .column-panel {
+    transition: flex-basis 0.4s ease-in-out;
+    border-right: 1px solid $foreground;
+    cursor: pointer;
+    
+    box-sizing: border-box;
+    min-width: 0;
+    flex-shrink: 0;
+    flex-grow: 0;
+    overflow: hidden;
+
+    &:active {
+      background-color: $secondary;
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+
+  .panel-active {
+    
+    cursor: default;
   }
 }

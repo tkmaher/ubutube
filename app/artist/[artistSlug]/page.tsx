@@ -9,7 +9,6 @@ const getArtistData = cache(async (artistSlug: string): Promise<Artist | null> =
         `https://ubu-worker.tomaszkkmaher.workers.dev/api/artists/${artistSlug}`
         );
         const data: { cached: boolean; artist: Artist; success: boolean } = await res.json();
-    console.log("Artist API response:", data);
     return data.success ? data.artist : null;
 });
 

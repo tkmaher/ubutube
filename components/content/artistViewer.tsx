@@ -73,7 +73,7 @@ export default function ArtistViewer({
             <div>
                 {artistData.name} {artistData.years}
             </div>
-            {artistData.description && <div>{artistData.description}</div>}
+            {artistData.description && <div dangerouslySetInnerHTML={{ __html: artistData.description}}/>}
             <a
                 href={`https://ubu.com/film/${artistData.ubuLink}`}
                 target="_blank"

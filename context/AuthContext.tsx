@@ -25,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     getMe().then(u => { 
-      console.log("user:", u);
       setUser(u); 
       setLoading(false); 
       u && setBookmarks(u.bookmarks ? u.bookmarks.split(',') : []);

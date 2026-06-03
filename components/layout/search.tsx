@@ -86,7 +86,6 @@ export default function Search() {
                     searchResults: SearchResult[];
                     success: boolean;
                 }) => {
-                    console.log("Search API response:", data);
                     if (data.success) setRawResults(data.searchResults);
                     else console.error("Search API error:", data);
                 }

@@ -237,7 +237,6 @@ export default function UserViewer({slug, initialData}: {slug: string, initialDa
     const [currentBookmarks, setCurrentBookmarks] = useState<string[]>(initialData?.bookmarks || []);
 
     useEffect(() => {
-        console.log("User API response:", initialData);
 
         if (initialData) return;
 

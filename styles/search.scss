@@ -3,13 +3,21 @@
 .right-bar {
   display: flex;
   flex-direction: column;
-  align-self: flex-end;
   flex-grow: 1;
-  height: $univHeight;
-  min-width: 15dvw;
-  max-width: 15dvw;
-  padding: 0.2em;
+  box-sizing: border-box;
   transition: opacity 0.1s ease-in-out;
+  overflow-y: auto;
+  overflow-x: none;
+
+  .right-bar {
+    padding: 0.2em;
+    height: 100dvh;
+  }
+
+  @media (min-width: 801px) {
+    min-width: 15dvw;
+    max-width: 15dvw;
+  }
 }
 
 .logo {
