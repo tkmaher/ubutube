@@ -155,30 +155,7 @@ export default function FilmViewer({
     const leftContent = (
         <>
             {filmData.src ? <VideoStream src={filmData.src} ubuLink={filmData.ubuLink} /> : "Error: no SRC found!"}
-            <div className="viewer-title">
-                <div>{filmData.name}</div>
-                <div className="stats">
-                    <div>{views} {views !== 1 ? "views" : "view"}</div>
-                    <VideoButton
-                        buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
-                        text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
-                        text2={!isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
-                        callback={bookmarkCallback}
-                    />
-                    <VideoButton
-                        buttonText="Share"
-                        text1="Copy link"
-                        text2="Link copied to clipboard!"
-                        callback={shareCallback}
-                    />
-                    <VideoButton
-                        buttonText={!commenting ? "Comments" : "Description"}
-                        text1={!commenting ? "View comments" : "View description"}
-                        text2={!commenting ? "View comments" : "View description"}
-                        callback={() => setCommenting(prev => !prev)}
-                    />
-                </div>
-            </div>
+            
             <div className="viewer-artists">
                 <div className="viewer-desc-comments">
                     <div>{filmData.year}</div>
@@ -214,7 +191,7 @@ export default function FilmViewer({
 
     const rightContent = filmData.bySameArtist.length > 1 && (
         <>
-            <div>More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
+            <div className="about">More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
             {filmData.bySameArtist.map((rec, i) =>
                 i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
             )}
@@ -224,6 +201,30 @@ export default function FilmViewer({
     return (
         <div className="content-container">
             {loading && <div className="loader">Loading...</div>}
+            <div className="viewer-title">
+                <div>{filmData.name}</div>
+                <div className="stats">
+                    <div>{views} {views !== 1 ? "views" : "view"}</div>
+                    <VideoButton
+                        buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
+                        text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
+                        text2={!isBookmarked ? "Removed from bookmarks!" : "Added to bookmarks!"}
+                        callback={bookmarkCallback}
+                    />
+                    <VideoButton
+                        buttonText="Share"
+                        text1="Copy link"
+                        text2="Link copied to clipboard!"
+                        callback={shareCallback}
+                    />
+                    <VideoButton
+                        buttonText={!commenting ? "Comments" : "Description"}
+                        text1={!commenting ? "View comments" : "View description"}
+                        text2={!commenting ? "View comments" : "View description"}
+                        callback={() => setCommenting(prev => !prev)}
+                    />
+                </div>
+            </div>
             <div style={{ opacity: loading ? 0 : 1 }} className="content-columns">
                 {isMobile ? (
                     <div className="content-left">
@@ -237,7 +238,7 @@ export default function FilmViewer({
                         </ReactLenis>
                         {filmData.bySameArtist.length > 1 && (
                             <div className="content-right">
-                                <div>More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
+                                <div className="about">More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
                                 <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
                                     {filmData.bySameArtist.map((rec, i) =>
                                         i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null

@@ -569,7 +569,7 @@ export default function VideoStream({
 
         {(!ready || error) && !isUnsupported && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 5,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                         background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.45)',
                         fontSize: 12, letterSpacing: '0.07em', fontFamily: 'monospace',
                         pointerEvents: 'none' }}>
@@ -590,7 +590,7 @@ export default function VideoStream({
             gap: 10, background: 'rgba(0,0,0,0.82)',
             color: 'rgba(255,255,255,0.65)', fontSize: 12,
             fontFamily: 'monospace', letterSpacing: '0.07em', textAlign: 'center', padding: '0 20px',
-          }}>
+          }}>lock
             <span>This format can't be played in the browser :/</span>
             <a href={src} download
               style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}

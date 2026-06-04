@@ -1,15 +1,16 @@
 @use "variables" as *;
 
 .content-container {
-    height: $univHeight;
+    height: 100%;
     overflow: hidden;
-    padding: 0.2em;
     display: flex;
     flex-direction: column;
 
     .content-footer {
         height: auto;
         flex-shrink: 0; 
+        border-top: 1px solid $foreground;
+        padding: 0.2em;
         .nav-bar {
             width: 100%;
             display: flex;
@@ -19,9 +20,36 @@
     }
 }
 
+.viewer-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0.2em;
+
+    border-bottom: 1px solid $foreground;
+
+    .stats {
+        display: flex;
+        gap: 0.5em;
+
+        button {
+            font-size: 16px;
+            font-family: $font !important;
+        }
+    }
+
+    @media (max-width: 800px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2em;
+        
+    }
+
+}
+
 .content-columns {
     display: flex;
-    gap: 0.2em;
     max-width: 100%;
     flex: 1;        
     min-height: 0;  
@@ -35,26 +63,10 @@
         min-width: 0;
         overflow-y: auto;
         overflow-x: hidden;
+        padding: 0.2em;
     }
 
-    .viewer-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-shrink: 0;
-
-        .stats {
-            display: flex;
-            gap: 0.5em;
-
-            button {
-                font-size: 16px;
-                font-family: $font !important;
-            }
-        }
-
-
-    }
+    
 
     .viewer-artists {
         display: flex;
@@ -113,10 +125,10 @@
     .content-right {
         display: flex;
         flex-direction: column;
-        gap: 0.2em;
         min-width: 15%;
         max-width: 15%;
-        height: $univHeight;
+        height: 100%;
+        border-left: 1px solid $foreground;
     }
 
     .recommended-list {
@@ -124,6 +136,7 @@
         overflow-x: hidden;
         flex: 1;
         min-height: 0;
+        border-top: 1px solid $foreground;
     }
 
     @media (max-width: 800px) {
@@ -146,6 +159,10 @@
             height: auto;
             flex: none;
             overflow: visible;
+            border: none;
+            .about {
+                padding: 0;
+            }
         }
     
         .recommended-list {
@@ -153,11 +170,7 @@
             flex: none;
         }
 
-        .viewer-title {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.2em;
-        }
+        
     }
 }
 

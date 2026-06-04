@@ -3,8 +3,8 @@ import { useCallback, useState } from "react";
 import Search from "./search";
 import Tools from "./tools";
 
-const COLLAPSED = "1em";
-const EXPANDED = "calc(100% - 2em)"; // full width minus both collapsed siblings
+const COLLAPSED = "1.2em";
+const EXPANDED = "calc(100% - 2.4em)"; 
 
 export default function Columns({ children }: { children: React.ReactNode }) {
     const [expanded, setExpanded] = useState<"left" | "right" | "main">("left");

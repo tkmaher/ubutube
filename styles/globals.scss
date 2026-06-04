@@ -37,7 +37,6 @@ input[type="text"], button {
     outline: none;
     border-color: $background;
   }
-  border-radius: 3px;
   font-family: $font !important;
   font-size: 16px !important;
 }
@@ -56,11 +55,11 @@ button {
   cursor: crosshair;
   display: flex;
   align-items: center;
+  padding: 0 0.2em;
   .collapse-trigger {
     cursor: crosshair;
     flex-grow: 1;
     justify-content: flex-end;
-    margin-right: 0.2em;
   }
 
   a {
@@ -74,6 +73,8 @@ button {
   }
 
 }
+
+.recommended-list
 
 .linkout {
   @include link-style;
@@ -98,6 +99,7 @@ button {
 
 .spiral {
   display: inline-block;
+  height: 1em;
 }
 
 .loader {
@@ -133,6 +135,12 @@ button {
   flex-direction: column;
   overflow: hidden;
 
+  border-right: 1px solid $foreground;
+
+  &:last-child {
+    border-right: none;
+  }
+
   .panel-tab {
     display: none;
   }
@@ -150,7 +158,6 @@ button {
 
   .column-panel {
     transition: flex-basis 0.4s ease-in-out;
-    border-right: 1px solid $foreground;
     cursor: pointer;
     
     box-sizing: border-box;
@@ -161,10 +168,6 @@ button {
 
     &:active {
       background-color: $secondary;
-    }
-
-    &:last-child {
-      border-right: none;
     }
   }
 

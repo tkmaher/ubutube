@@ -10,7 +10,6 @@
   overflow-x: none;
 
   .right-bar {
-    padding: 0.2em;
     height: 100dvh;
   }
 
@@ -93,13 +92,15 @@
   overflow-x: hidden;
   z-index: 3;
   transition: opacity 0.1s ease-in-out;
-  margin: 0.2em 0;
+  border-top: 1px solid $foreground;
+  border-bottom: 1px solid $foreground;
 }
 
 .search-form {
   display: flex;
   flex-direction: column;
   gap: 0.2em;
+  padding: 0.2em;
 }
 
 .search-row {

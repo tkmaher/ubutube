@@ -70,23 +70,15 @@ export default function ArtistViewer({
 
     const leftContent = (
         <>
-            <div>
-                {artistData.name} {artistData.years}
-            </div>
+
             {artistData.description && <div dangerouslySetInnerHTML={{ __html: artistData.description}}/>}
-            <a
-                href={`https://ubu.com/film/${artistData.ubuLink}`}
-                target="_blank"
-                className="linkout ubu-linkout"
-            >
-                View on ubu.com
-            </a>
+            
         </>
     );
 
     const rightContent = artistData.bySameArtist.length > 0 && (
         <>
-            <div>Films by {artistData.name}:</div>
+            <div className="about">Films by {artistData.name}:</div>
             {artistData.bySameArtist.map((rec, i) => (
                 <RecommendedFilm key={i} src={rec} />
             ))}
@@ -96,6 +88,9 @@ export default function ArtistViewer({
     return (
         <div className="content-container">
             {loading && <div className="loader">Loading...</div>}
+            <div className="viewer-title">
+                {artistData.name} {artistData.years}
+            </div>
             <div style={{ opacity: loading ? 0 : 1 }} className="content-columns">
                 {isMobile ? (
                     <div className="content-left content-left-artists">
@@ -117,7 +112,7 @@ export default function ArtistViewer({
                         </ReactLenis>
                         {artistData.bySameArtist.length > 0 && (
                             <div className="content-right content-recommended-artists">
-                                <div>Films by {artistData.name}:</div>
+                                <div className="about">Films by {artistData.name}:</div>
                                 <ReactLenis
                                     className="recommended-list"
                                     data-lenis-prevent
@@ -131,6 +126,15 @@ export default function ArtistViewer({
                         )}
                     </>
                 )}
+            </div>
+            <div className="content-footer">
+                <a
+                    href={`https://ubu.com/film/${artistData.ubuLink}`}
+                    target="_blank"
+                    className="linkout ubu-linkout"
+                >
+                    View on ubu.com
+                </a>
             </div>
         </div>
     );

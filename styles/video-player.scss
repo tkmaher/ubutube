@@ -1,9 +1,9 @@
 .vs-root {
-    width: 100%;
+    width: calc(100% + 0.4em);
     min-height: 10em;
     flex-basis: 55%;
     flex-shrink: 0;
-    margin-bottom: 0.2em;
+    margin: -0.2em -0.2em 0.2em -0.2em;
 
     video {
         width: 100%;
