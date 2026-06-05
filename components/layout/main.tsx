@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import Search from "./search";
 import Tools from "./tools";
 
-const COLLAPSED = "1.2em";
-const EXPANDED = "calc(100% - 2.4em)";
+const COLLAPSED = "2em";
+const EXPANDED = "calc(100% - 4em)";
 
 export default function Columns({ children }: { children: React.ReactNode }) {
-    const [expanded, setExpanded] = useState<"left" | "right" | "main">("left");
+    const [expanded, setExpanded] = useState<"left" | "right" | "main">("main");
 
     const expand = useCallback((side: "left" | "right" | "main") => {
         setExpanded(side);

@@ -184,5 +184,8 @@ button {
   .column-panel:not(.panel-active) div,
   .column-panel:not(.panel-active) [role="button"] {
       pointer-events: none;
+      .collapse-trigger {
+        display: none;
+      }
   }
 }

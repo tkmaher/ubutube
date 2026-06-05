@@ -198,9 +198,13 @@
             border-top: 1px solid $foreground;
         }
 
+        .content-right-user {
+            max-width: 100%;
+        }
+
         .recommended-list {
             flex-shrink: 0;   
-            max-height: 40vh; 
+            max-height: 25dvh; 
             overflow-y: auto;
             border-left: none;
             border-top: 1px solid $foreground;
