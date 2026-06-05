@@ -42,7 +42,7 @@ export default function UserListViewer({ initialData, page, order }: {
         <div className="content-container">
             <div className="viewer-title">
                 <div>
-                    User list ({userList?.totalUsers ?? "?"} user{userList?.totalUsers === 1 ? "" : "s"})
+                    Users ({userList?.totalUsers ?? "?"} user{userList?.totalUsers === 1 ? "" : "s"})
                 </div>
                 <button>
                     <Link href={`/userlist?page=1&order=${order === "asc" ? "desc" : "asc"}`} className="linkout ubu-linkout">

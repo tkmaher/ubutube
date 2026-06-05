@@ -174,7 +174,7 @@ export default function Search() {
                     syncTouch: true,
                 }}
             >
-                {searchResults.children.length === 0 && "(No results)"}
+                {searchResults.children.length === 0 && <div className="tabs">(No results)</div>}
                 {priority === "artist"
                     ? (searchResults.children as SearchTreeArtist[]).map(
                           (artistGroup, i) => (

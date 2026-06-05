@@ -127,3 +127,9 @@
     justify-self: center;
   }
 }
+
+@media (max-width: 800px) {
+  .random-button {
+    flex-basis: 30%;
+  }
+}

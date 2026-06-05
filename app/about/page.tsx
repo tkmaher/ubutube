@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/styles/content.scss";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "About",
@@ -23,6 +24,11 @@ export default function Page() {
                     UbuTube currently supports account creation, film bookmarking, and commenting. Please keep your activities respectful and intentional.
                 </div>
                 <br/>
+                <div className="tab1">
+                    <Link href="/userlist" className="linkout">
+                        Users
+                    </Link>
+                </div>
                 <div className="tab1">
                     <a href="mailto:admin@ubutube.org" target="_blank" className="linkout">
                         Contact us

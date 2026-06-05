@@ -25,7 +25,7 @@ export default function Tools() {
         <div className="left-bar">
             <div className="header">
                 <Link className="linkout ubu-linkout" href="/about">About</Link>
-                <Link className="linkout ubu-linkout" href="/userlist">User list</Link>
+                <Link className="linkout ubu-linkout" href="/userlist">Users</Link>
             </div>
 
             <div className="footer" style={{ opacity: loading ? 0 : 1}}>
@@ -37,7 +37,7 @@ export default function Tools() {
                             <a className="linkout ubu-linkout" onClick={handleLogout}>Log out</a>
                         </>
                     ) : (
-                    <div className="tabs">
+                    <div>
                         <Link href="/login" className="linkout">Log in</Link>/<Link href="/signup" className="linkout">Sign up</Link>
                     </div>
                     )

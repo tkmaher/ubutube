@@ -40,6 +40,10 @@ input[type="text"], button {
   font-size: 16px !important;
 }
 
+input {
+  border: 1px solid $foreground;
+}
+
 button {
   @include link-style;
   cursor: pointer;
