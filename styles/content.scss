@@ -168,45 +168,43 @@
 
     @media (max-width: 800px) {
         flex-direction: column;
-        overflow-y: auto;
         min-height: 0;
-
+        flex: 1;          
+        overflow: hidden; 
+    
         .content-left {
-            height: 100%;
+            flex: 1;          
+            min-height: 0;  
             overflow-y: auto;
-            flex: none;
+            height: auto !important;
         }
-
-        &:has(.recommended-list) {
-            .content-left {
-                height: 70% !important;
-            }
+    
+        &:has(.recommended-list) .content-left {
+            flex: 1;
+            height: auto !important;
         }
-
-        &:has(.content-right-user) {
-            .content-left {
-                height: fit-content !important;
-            }
+    
+        &:has(.content-right-user) .content-left {
+            flex: 1;
+            height: auto !important;
         }
+    
 
         .content-right {
-            max-width: 100%;
-            min-width: 100%;
+            flex-shrink: 0;
             height: auto;
-            flex: none;
             overflow: visible;
             border-left: none;
             border-top: 1px solid $foreground;
         }
+
         .recommended-list {
-            max-width: 100%;
-            min-width: 100%;
+            flex-shrink: 0;   
+            max-height: 40vh; 
             overflow-y: auto;
-            flex: none;
             border-left: none;
             border-top: 1px solid $foreground;
-            // Give it a capped height so it's independently scrollable
-            max-height: 40vh;
+            min-width: 100%;
         }
     }
 }
