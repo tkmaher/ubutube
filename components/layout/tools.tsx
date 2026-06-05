@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function Tools() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const encodedUsername = user ? encodeURIComponent(user.username) : null;
+  const encodedUsername = user ? encodeURIComponent(encodeURIComponent(user.username)) : null;
 
   const handleLogout = async () => {
     await logout();
@@ -15,47 +15,44 @@ export default function Tools() {
   };
 
   return (
-    <div className="left-bar">
-        <div className="header">
-            <div className="tabs">
-                <Link className="linkout" href="/"><div className="spiral">𖦹</div>UbuTube</Link>
-            </div>
-            <div className="tabs">
-                <Link className="linkout" href="/about">About</Link>
-            </div>
-
+    <>
+        <div className="left-header">
+            <Link className="linkout" href="/" style={{lineHeight: 1}}>
+                <div className="spiral">𖦹</div>
+                UbuTube
+            </Link>
         </div>
+        <div className="left-bar">
+            <div className="header">
+                
+                    <Link className="linkout ubu-linkout" href="/about">About</Link>
 
-        <div className="footer" style={{ opacity: loading ? 0 : 1}}>
-            
-            {!loading && (
-                user ? (
-                    <>
-                        <div className="tabs">
-                            <Link href={`/users/${encodedUsername}`} className="linkout">{user.username}</Link> 
-                        </div>
-                        <div className="tabs">
-                            <a className="linkout" onClick={handleLogout}>Log out</a>
-                        </div>
-                    </>
-                ) : (
-                <div className="tabs">
-                    <Link href="/login" className="linkout">Log in</Link>/<Link href="/signup" className="linkout">Sign up</Link>
-                </div>
-                )
-            )}
-            <div className="tabs">
-                <a href="mailto:admin@ubutube.org" target="_blank" className="linkout">
-                    Contact us
-                </a>
-            </div>
-            <div className="tabs">
-                <a href="mailto:bugreport@ubutube.org" target="_blank" className="linkout">
-                    Report a bug!
-                </a>
             </div>
 
+            <div className="footer" style={{ opacity: loading ? 0 : 1}}>
+                
+                {!loading && (
+                    user ? (
+                        <>
+                            <Link href={`/users/${encodedUsername}`} className="linkout ubu-linkout">{user.username}</Link> 
+                            <a className="linkout ubu-linkout" onClick={handleLogout}>Log out</a>
+                        </>
+                    ) : (
+                    <div className="tabs">
+                        <Link href="/login" className="linkout">Log in</Link>/<Link href="/signup" className="linkout">Sign up</Link>
+                    </div>
+                    )
+                )}
+                    <a href="mailto:admin@ubutube.org" target="_blank" className="linkout ubu-linkout">
+                        Contact us
+                    </a>
+                    <a href="mailto:bugreport@ubutube.org" target="_blank" className="linkout ubu-linkout">
+                        Report a bug!
+                    </a>
+
+            </div>
         </div>
-    </div>
+    </>
+    
   );
 }

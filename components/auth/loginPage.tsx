@@ -40,13 +40,13 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <p className="auth-error">{error}</p>}
+          {error && <div className="auth-error">{error}</div>}
 
           <label>
             <div>Email</div>
             <input
               type="email" value={email} required autoComplete="email"
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)} id="email"
             />
           </label>
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
             <div>Password</div>
             <input
               type="password" value={password} required autoComplete="current-password"
-              onChange={e => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)} id="password"
             />
           </label>
 

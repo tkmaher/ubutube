@@ -32,7 +32,6 @@ a, a:visited, a:hover, a:active {
 
 input[type="text"], button {
   border: none;
-  transition: border-color 0.1s ease-in-out, background-color 0.1s ease-in-out;
   &:focus {
     outline: none;
     border-color: $background;
@@ -42,8 +41,11 @@ input[type="text"], button {
 }
 
 button {
-  background-color: $secondary;
+  @include link-style;
   cursor: pointer;
+  padding: 0;
+  background-color: transparent;
+  text-decoration: underline;
 }
 
 .about {
@@ -54,7 +56,7 @@ button {
 .tabs {
   cursor: crosshair;
   display: flex;
-  align-items: center;
+  align-items: flex-start !important;
   padding: 0 0.2em;
   .collapse-trigger {
     cursor: crosshair;
@@ -74,18 +76,18 @@ button {
 
 }
 
-.recommended-list
 
 .linkout {
   @include link-style;
   text-overflow: ellipsis;
   overflow: hidden;
   text-wrap: pretty;
+  word-break: break-word;
 }
 
 @media (hover: hover) {
   button:hover {
-    background-color: $background;
+    background-color: $secondary;
   }
 
 
@@ -93,13 +95,6 @@ button {
 
 .ubu-linkout {
   width: fit-content;
-}
-
-
-
-.spiral {
-  display: inline-block;
-  height: 1em;
 }
 
 .loader {
@@ -174,5 +169,8 @@ button {
   .panel-active {
     
     cursor: default;
+    &:active {
+      background-color: transparent !important;
+    }
   }
 }

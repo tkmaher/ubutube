@@ -7,9 +7,9 @@
     justify-content: space-between;
     box-sizing: border-box;
     overflow-y: auto;
-
+    
     .left-bar {
-        height: 100dvh;
+      height: 100dvh;
     }
   
     @media (min-width: 801px) {
@@ -20,11 +20,20 @@
     .footer, .header {
       display: flex;
       flex-direction: column;
+      padding: 0.2em;
     }
   
     .footer {
       transition: opacity 0.1s ease-in-out;
+      border-top: 1px solid $foreground;
     }
+
+    
+}
+
+.left-header {
+  border-bottom: 1px solid $foreground;
+  padding: 0.2em !important;
 }
 
 .auth-page {
@@ -33,7 +42,20 @@
     flex-direction: column;
     gap: 0.2em;
 
-    height: $univHeight;
+}
+
+@keyframes spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+.spiral {
+  animation: spin 2s linear infinite; 
+  display: inline-block;
 }
 
 .auth-form {

@@ -33,7 +33,7 @@ function ResetContent() {
   if (!token) {
     return (
       <>
-        <p className="auth-error">Invalid or missing reset link.</p>
+        <div className="auth-error">Invalid or missing reset link.</div>
         <Link href="/forgot-password" className="auth-link">Request a new one</Link>
       </>
     );
@@ -49,7 +49,7 @@ function ResetContent() {
           <input
             type="password" value={password} required minLength={8}
             autoComplete="new-password" placeholder="Minimum 8 characters"
-            onChange={e => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)} id="new-password"
           />
         </label>
 
@@ -58,7 +58,7 @@ function ResetContent() {
           <input
             type="password" value={confirm} required minLength={8}
             autoComplete="new-password"
-            onChange={e => setConfirm(e.target.value)}
+            onChange={e => setConfirm(e.target.value)} id="confirm-password"
           />
         </label>
 
@@ -74,7 +74,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <Suspense fallback={<p className="auth-message">Loading…</p>}>
+        <Suspense fallback={<div className="auth-message">Loading…</div>}>
           <ResetContent />
         </Suspense>
       </div>

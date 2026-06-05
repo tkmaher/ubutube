@@ -8,9 +8,10 @@
 
     .content-footer {
         height: auto;
-        flex-shrink: 0; 
+        flex-shrink: 0;
         border-top: 1px solid $foreground;
         padding: 0.2em;
+
         .nav-bar {
             width: 100%;
             display: flex;
@@ -26,7 +27,6 @@
     align-items: center;
     flex-shrink: 0;
     padding: 0.2em;
-
     border-bottom: 1px solid $foreground;
 
     .stats {
@@ -43,16 +43,22 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 0.2em;
-        
-    }
 
+        .stats {
+            width: 100%;
+
+            div {
+                flex-grow: 1;
+            }
+        }
+    }
 }
 
 .content-columns {
     display: flex;
     max-width: 100%;
-    flex: 1;        
-    min-height: 0;  
+    flex: 1;
+    min-height: 0;
     transition: opacity 0.1s ease-in-out;
 
     .content-left {
@@ -66,19 +72,16 @@
         padding: 0.2em;
     }
 
-    
-
     .viewer-artists {
         display: flex;
         white-space: pre;
         flex-shrink: 0;
     }
 
-    // ── The key layout block ──────────────────────────────────────
     .viewer-desc-comments {
         display: flex;
-        flex: 1;       
-        min-height: 0;  // lets flex children shrink below their content size
+        flex: 1;
+        min-height: 0;
         gap: 0.2em;
     }
 
@@ -95,33 +98,31 @@
     }
 
     .content-desc {
-        flex: 1;        // each panel takes exactly 50%
+        flex: 1;
         min-width: 0;
+
         form {
             display: flex;
             flex-direction: column;
             gap: 0.2em;
             align-items: flex-start;
+
             textarea {
                 width: calc(100% - 0.4em) !important;
                 background: transparent;
                 font-family: $font !important;
                 font-size: 1em;
-                flex-grow: 1
+                flex-grow: 1;
             }
         }
     }
-    // ─────────────────────────────────────────────────────────────
 
     .viewer-description a,
     .viewer-comments a {
         @include link-style;
     }
 
-    .ubu-linkout {
-        flex-shrink: 0; // never squeezed — sits naturally after the growing area
-    }
-
+    // Right column: 15% for film/artist, overridden to 50% for user
     .content-right {
         display: flex;
         flex-direction: column;
@@ -129,14 +130,29 @@
         max-width: 15%;
         height: 100%;
         border-left: 1px solid $foreground;
+        overflow-y: auto;
     }
 
+    .content-right-user {
+        min-width: 50%;
+        max-width: 50%;
+
+        .tabcontainer {
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
+
+    // Shared recommended-list (used in film & artist viewers)
     .recommended-list {
+        min-width: 15%;
+        max-width: 15%;
         overflow-y: auto;
         overflow-x: hidden;
-        flex: 1;
+        flex-shrink: 0;
         min-height: 0;
-        border-top: 1px solid $foreground;
+        border-left: 1px solid $foreground;
     }
 
     @media (max-width: 800px) {
@@ -144,63 +160,79 @@
         overflow-y: auto;
         min-height: 0;
 
-        .vs-root {
-            flex-basis: auto !important;
-        }
-    
         .content-left {
-            height: auto;
-            overflow: visible;
+            height: 100%;
+            overflow-y: auto;
             flex: none;
         }
-    
-        .content-right {
-            max-width: 100%;
-            height: auto;
-            flex: none;
-            overflow: visible;
-            border: none;
-            .about {
-                padding: 0;
+
+        &:has(.recommended-list) {
+            .content-left {
+                height: 70% !important;
             }
         }
-    
-        .recommended-list {
-            overflow: visible;
-            flex: none;
+
+        &:has(.content-right-user) {
+            .content-left {
+                height: fit-content !important;
+            }
         }
 
-        
+        .content-right {
+            max-width: 100%;
+            min-width: 100%;
+            height: auto;
+            flex: none;
+            overflow: visible;
+            border-left: none;
+            border-top: 1px solid $foreground;
+        }
+
+        .recommended-list {
+            max-width: 100%;
+            min-width: 100%;
+            overflow-y: auto;
+            flex: none;
+            border-left: none;
+            border-top: 1px solid $foreground;
+            // Give it a capped height so it's independently scrollable
+            max-height: 40vh;
+        }
     }
 }
-
-
 
 .bookmarks-viewer {
     display: flex;
     flex-direction: column;
-    gap: 0.2em;
 }
 
-.bookmark, .comment {
+.bookmark,
+.comment {
     display: flex;
     gap: 0.2em;
+
     .tab1 {
         margin-left: 2em;
         padding-left: 0 !important;
     }
-    button {
+
+    .button {
         opacity: 0;
-        margin-left: 0.2em;
         transition: opacity 0.1s ease-in-out;
     }
+
     &:hover {
-        button {
+        .button {
             opacity: 1;
         }
     }
 }
 
+.bookmark {
+    justify-content: space-between;
+}
+
 .comment {
     flex-direction: column;
+    align-items: flex-start;
 }

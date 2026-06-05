@@ -10,12 +10,13 @@ import { useAuth } from "@/context/AuthContext";
 import { modifyBookmark } from "@/lib/auth-client";
 import Comments from "./comments";
 import { revalidateUserCache } from "@/lib/actions";
+import { motion } from "framer-motion";
 
 const lenisOptions = { lerp: 0.2, syncTouch: true };
 
 function RecommendedFilm({ src }: { src: FilmSimpler }) {
     return (
-        <div className="content-rect tabs">
+        <div className="content-rect tabs tab1">
             <div>
                 <Link href={`/film/${src.id}`} className="linkout">
                     {src.name}
@@ -52,6 +53,38 @@ function VideoButton({
             <Tooltip text={useText1 ? text1 : text2} />
         </button>
     );
+}
+
+function RecommendedFilms({ recommendedFilms, plural }: { 
+    recommendedFilms: FilmSimpler[], 
+    plural: boolean
+}) {
+    const [bCollapsed, setBCollapsed] = useState(false);
+
+    return (
+        <div className="tabcontainer">
+            <div className="tab0 tabs" onClick={() => setBCollapsed(c => !c)}>
+                <a>More by {plural ? "these artists" : "this artist"}</a>
+                <div
+                    className="collapse-trigger"
+                >
+                    {bCollapsed ? "+" : "×"}
+                </div>
+            </div>
+            <motion.div
+                animate={{ height: bCollapsed ? 0 : "auto", opacity: bCollapsed ? 0 : 1 }}
+                initial={false}
+                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                style={{ overflow: "hidden" }}
+            >
+                <div className="bookmarks-viewer">
+                    {recommendedFilms.map((film, index) => 
+                        <RecommendedFilm key={index} src={film} />
+                    )}
+                </div>
+            </motion.div>
+        </div>
+    )
 }
 
 export default function FilmViewer({
@@ -161,42 +194,36 @@ export default function FilmViewer({
                     <div>{filmData.year}</div>
                     <div>{"—"}</div>
                     {filmData.artists.map((artist, i) => (
-                        <div className="tabs" key={artist}>
-                            <Link href={`/artist/${encodeURIComponent(encodeURIComponent(artist))}`} className="linkout">
-                                {artist}{i !== filmData.artists.length - 1 && ", "}
+                        <div className="" key={artist}>
+                            <Link className="linkout" href={`/artist/${encodeURIComponent(encodeURIComponent(artist))}`} >
+                                {artist}
                             </Link>
+                            {i !== filmData.artists.length - 1 && ", "}
                         </div>
                     ))}
                 </div>
             </div>
             <div className="viewer-desc-comments">
-                {filmData.description &&
+                
                     <div className="content-desc">
                         {!commenting ? (
-                            <div
-                                className="viewer-description"
-                                dangerouslySetInnerHTML={{ __html: filmData.description }}
-                            />
+                            filmData.description ?
+                                <div
+                                    className="viewer-description"
+                                    dangerouslySetInnerHTML={{ __html: filmData.description }}
+                                />
+                            : <></>
                         ) : (
                             <div className="comment-header">
-                                Comments
                                 <Comments filmId={filmData.id} filmName={filmData.name} />
                             </div>
                         )}
                     </div>
-                }
             </div>
         </>
     );
 
-    const rightContent = filmData.bySameArtist.length > 1 && (
-        <>
-            <div className="about">More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
-            {filmData.bySameArtist.map((rec, i) =>
-                i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
-            )}
-        </>
-    );
+   
 
     return (
         <div className="content-container">
@@ -226,27 +253,16 @@ export default function FilmViewer({
                 </div>
             </div>
             <div style={{ opacity: loading ? 0 : 1 }} className="content-columns">
-                {isMobile ? (
-                    <div className="content-left">
-                        {leftContent}
-                        {(rightContent && !commenting) && <div className="content-right">{rightContent}</div>}
-                    </div>
-                ) : (
-                    <>
-                        <ReactLenis data-lenis-prevent options={lenisOptions} className="content-left">
-                            {leftContent}
-                        </ReactLenis>
-                        {filmData.bySameArtist.length > 1 && (
-                            <div className="content-right">
-                                <div className="about">More by {filmData.artists.length > 1 ? "these artists:" : "this artist:"}</div>
-                                <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
-                                    {filmData.bySameArtist.map((rec, i) =>
-                                        i !== vidIndexInQueue ? <RecommendedFilm key={i} src={rec} /> : null
-                                    )}
-                                </ReactLenis>
-                            </div>
-                        )}
-                    </>
+                <ReactLenis data-lenis-prevent options={lenisOptions} className="content-left">
+                    {leftContent}
+                </ReactLenis>
+                {filmData.bySameArtist.length > 1 && (
+                    <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
+                        <RecommendedFilms 
+                            recommendedFilms={filmData.bySameArtist.filter((_, i) => i !== vidIndexInQueue)} 
+                            plural={filmData.artists.length > 1} 
+                        />
+                    </ReactLenis>
                 )}
             </div>
             <div className="content-footer">

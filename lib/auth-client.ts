@@ -9,6 +9,7 @@ const call = async (path: string, init?: RequestInit) => {
     ...init,
   });
   const data = await res.json();
+  console.log("API response:", { path, init, res, data });
   if (!res.ok) throw new Error(data.error ?? "Request failed");
   return data;
 };
@@ -50,3 +51,6 @@ export const deleteComment = (date: string, film_id: string) =>
 
 export const editUser = ( link: string, username: string) => 
   call("/api/auth/edit", { method: "POST", body: JSON.stringify({"link": link, "username": username }) });
+
+export const deleteUser = ( password: string ) => 
+  call("/api/auth/account", { method: "DELETE", body: JSON.stringify({"password": password }) });

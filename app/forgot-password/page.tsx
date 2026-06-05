@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
               <div>Email</div>
               <input
                 type="email" value={email} required autoComplete="email"
-                onChange={e => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)} id="email"
               />
             </label>
             <button type="submit" className="ubu-linkout" disabled={loading}>

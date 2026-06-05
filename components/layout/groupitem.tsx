@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { SearchResult, SearchTreeArtist, SearchTreeYear } from "@/types/search";
 import { SubGroupItem } from "@/components/layout/subgroupitem";
@@ -23,12 +23,19 @@ type Props = ArtistModeProps | YearModeProps;
 
 export function GroupItem(props: Props) {
     const [collapsed, setCollapsed] = useState(true);
+    const [resetKey, setResetKey] = useState(0);
+    const isFirstRender = useRef(true);
 
     const label = props.mode === "artist" ? props.name : props.year;
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         setCollapsed(true);
-    }, [props.query]);
+        setResetKey(k => k + 1);
+    }, [props]);
 
     const subItems =
         props.mode === "artist"
@@ -54,23 +61,21 @@ export function GroupItem(props: Props) {
     return (
         <div className="tabcontainer">
             <div className="tab0 tabs" onClick={() => setCollapsed(c => !c)}>
-                {props.mode == "artist" ?
-                    <Link 
-                        className="linkout" href={`/artist/${encodeURIComponent(encodeURIComponent(label))}`}
+                {props.mode === "artist" ? (
+                    <Link
+                        className="linkout"
+                        href={`/artist/${encodeURIComponent(encodeURIComponent(label))}`}
                         onClick={e => e.stopPropagation()}
                     >
                         {label}
                     </Link>
-                    :
+                ) : (
                     <a>{label}</a>
-                }
-                <div
-                    className="collapse-trigger"
-                >
-                    {collapsed ? "+" : "-"}
-                </div>
+                )}
+                <div className="collapse-trigger">{collapsed ? "+" : "×"}</div>
             </div>
             <motion.div
+                key={resetKey}
                 animate={{ height: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
                 initial={false}
                 transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}

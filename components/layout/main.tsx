@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Search from "./search";
 import Tools from "./tools";
 
@@ -12,6 +13,12 @@ export default function Columns({ children }: { children: React.ReactNode }) {
     const expand = useCallback((side: "left" | "right" | "main") => {
         setExpanded(side);
     }, []);
+
+    const pathname = usePathname();
+
+    useEffect(() => {
+        setExpanded("main");
+    }, [pathname]);
 
     const width = (side: "left" | "right" | "main") =>
         expanded === side ? EXPANDED : COLLAPSED;
