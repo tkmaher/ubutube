@@ -46,3 +46,14 @@ export interface Comment {
 	comment: string,
 	date: string
 }
+
+export interface UserListUser {
+	username: string;
+}
+
+export interface UserList {
+	users: UserListUser[];
+	page: number;
+	totalPages: number;
+	totalUsers: number;
+}

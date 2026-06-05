@@ -24,9 +24,8 @@ export default function Tools() {
         </div>
         <div className="left-bar">
             <div className="header">
-                
-                    <Link className="linkout ubu-linkout" href="/about">About</Link>
-
+                <Link className="linkout ubu-linkout" href="/about">About</Link>
+                <Link className="linkout ubu-linkout" href="/userlist">User list</Link>
             </div>
 
             <div className="footer" style={{ opacity: loading ? 0 : 1}}>

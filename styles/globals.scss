@@ -146,6 +146,8 @@ button {
   }
 }
 
+
+
 @media (max-width: 800px) {
   .appcontainer {
     height: 100dvh;
@@ -172,5 +174,15 @@ button {
     &:active {
       background-color: transparent !important;
     }
+  }
+
+  .column-panel:not(.panel-active) a,
+  .column-panel:not(.panel-active) button,
+  .column-panel:not(.panel-active) input,
+  .column-panel:not(.panel-active) textarea,
+  .column-panel:not(.panel-active) select,
+  .column-panel:not(.panel-active) div,
+  .column-panel:not(.panel-active) [role="button"] {
+      pointer-events: none;
   }
 }
