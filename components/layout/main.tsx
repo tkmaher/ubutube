@@ -9,15 +9,19 @@ const COLLAPSED = "2em";
 const EXPANDED = "calc(100% - 4em)";
 
 export default function Columns({ children }: { children: React.ReactNode }) {
-    const [expanded, setExpanded] = useState<"left" | "right" | "main">("main");
+    const pathname = usePathname();
+    const [expanded, setExpanded] = useState<"left" | "right" | "main">(pathname =="/" ? "left" : "main");
 
     const expand = useCallback((side: "left" | "right" | "main") => {
         setExpanded(side);
     }, []);
 
-    const pathname = usePathname();
 
     useEffect(() => {
+        if (pathname === "/") {
+            setExpanded("left");
+            return;
+        }
         setExpanded("main");
     }, [pathname]);
 

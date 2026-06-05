@@ -35,9 +35,10 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
         try {
             await editUser(link ?? "", username);
             setSubmitText("Profile updated!");
-            router.push(`/users/${username}`);
             setUser({ ...user, username, link: link ?? "" });
             submitCallback(link ?? "");
+            if (username !== user.username)
+                router.push(`/users/${encodeURIComponent(encodeURIComponent(username))}`);
         } catch (err) {
             setSubmitText(err instanceof Error ? err.message : "Update failed");
         } finally {
