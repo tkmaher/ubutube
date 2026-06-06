@@ -81,9 +81,8 @@ export default function ArtistViewer({
             </div>
             <div style={{ opacity: loading ? 0 : 1 }} className="content-columns">
                 <ReactLenis data-lenis-prevent options={lenisOptions} className="content-left">
-                    {artistData.description && (
-                        <div dangerouslySetInnerHTML={{ __html: artistData.description }} />
-                    )}
+                    
+                        <div dangerouslySetInnerHTML={{ __html: artistData.description ?? "" }} />
                 </ReactLenis>
                 {artistData.bySameArtist.length > 0 && (
                     <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
