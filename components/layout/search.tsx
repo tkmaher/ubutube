@@ -128,7 +128,6 @@ export default function Search() {
                         router.push(`/film/${randomFilm.id}`);
                     }}
                         type="button"
-                        className="random-button"
                         aria-label="Random film"
                     >
                         ?

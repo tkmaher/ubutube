@@ -5,7 +5,7 @@ import Link from "next/link";
 import ReactLenis from "lenis/react";
 import { motion } from "framer-motion";
 
-const lenisOptions = { lerp: 0.1, syncTouch: true };
+const lenisOptions = { lerp: 0.2, syncTouch: true };
 
 function RecommendedFilm({ src }: { src: FilmSimpler }) {
     return (

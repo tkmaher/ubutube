@@ -10,7 +10,7 @@ import { formatToMMDDYYYY } from "@/lib/utility";
 import { useRouter } from "next/navigation";
 import ReactLenis from "lenis/react";
 
-const lenisOptions = { lerp: 0.1, syncTouch: true };
+const lenisOptions = { lerp: 0.2, syncTouch: true };
 
 function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => void }) {
     const { user, setUser } = useAuth();

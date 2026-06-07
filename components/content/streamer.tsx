@@ -575,7 +575,7 @@ export default function VideoStream({
                         pointerEvents: 'none' }}>
             {error ?
               <div style={{pointerEvents: 'auto'}}>
-                <span>Playback error :/</span>
+                <span>Playback error :/ </span>
                 <a href={`https://ubu.com/film/${ubuLink}`} className='watch-link' target='_blank'>Watch on ubu.com</a>
               </div> :
               'Loading…'
@@ -590,7 +590,7 @@ export default function VideoStream({
             gap: 10, background: 'rgba(0,0,0,0.82)',
             color: 'rgba(255,255,255,0.65)', fontSize: 12,
             fontFamily: 'monospace', letterSpacing: '0.07em', textAlign: 'center', padding: '0 20px',
-          }}>lock
+          }}>
             <span>This format can't be played in the browser :/</span>
             <a href={src} download
               style={{ color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}

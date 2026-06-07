@@ -8,7 +8,7 @@ import "@/styles/content.scss";
 import "@/styles/search.scss";
 
 
-const lenisOptions = { lerp: 0.1, syncTouch: true };
+const lenisOptions = { lerp: 0.2, syncTouch: true };
 
 export default function UserListViewer({ initialData, page, order }: { 
     initialData: UserList | null, 
