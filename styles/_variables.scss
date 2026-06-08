@@ -7,9 +7,18 @@ $font: Garamond, "Apple Garamond", "Baskerville", "Libre Baskerville", "Times Ne
 @mixin link-style {
     color: $foreground;
     text-decoration: none;
-    &:hover {
-        background-color: $secondary;
-        text-decoration: underline;
-        cursor: pointer;
+    @media (hover: hover) {
+        &:hover {
+            background-color: $secondary;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    }
+    @media (max-width: 800px) {
+        &:active {
+            background-color: $secondary;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     }
 }

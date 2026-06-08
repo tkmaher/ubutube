@@ -187,6 +187,7 @@
         &:has(.content-right-user) .content-left {
             flex: 1;
             height: auto !important;
+            min-height: 2em;
         }
     
 
@@ -233,9 +234,19 @@
         transition: opacity 0.1s ease-in-out;
     }
 
-    &:hover {
-        .button {
-            opacity: 1;
+    @media (hover: hover) {
+        &:hover {
+            .button {
+                opacity: 1;
+            }
+        }
+    }
+
+    @media (max-width: 800px) {
+        &:active {
+            .button {
+                opacity: 1;
+            }
         }
     }
 }

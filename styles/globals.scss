@@ -78,6 +78,12 @@ button {
     }
   }
 
+  @media (max-width: 800px) {
+    &:active {
+      background-color: $secondary;
+    }
+  }
+
 }
 
 
@@ -93,8 +99,6 @@ button {
   button:hover {
     background-color: $secondary;
   }
-
-
 }
 
 .ubu-linkout {
@@ -191,5 +195,20 @@ button {
       .collapse-trigger {
         display: none;
       }
+  }
+
+  body {
+    font-size: 20px !important;
+  }
+  button, input[type="text"] {
+    font-size: 22px !important;
+  }
+
+  button:active {
+    background-color: $secondary;
+  }
+
+  .tooltip-parent:active .tooltip {
+    display: block;
   }
 }

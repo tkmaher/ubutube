@@ -86,7 +86,7 @@ export default function ArtistViewer({
                 </ReactLenis>
                 {artistData.bySameArtist.length > 0 && (
                     <ReactLenis className="recommended-list" data-lenis-prevent options={lenisOptions}>
-                        <RecommendedFilms films={artistData.bySameArtist} />
+                        <RecommendedFilms films={artistData.bySameArtist.sort((a, b) => a.year.localeCompare(b.year) )} />
                     </ReactLenis>
                 )}
             </div>
