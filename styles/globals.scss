@@ -140,6 +140,7 @@ button {
     display: none;
     position: fixed;
     background-color: $secondary;
+    border: 1px solid $foreground;
 
     z-index: 1000;
   }
