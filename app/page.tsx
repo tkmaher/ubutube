@@ -14,6 +14,7 @@ export default function Home() {
         priority={true}
         onLoad={() => setLoaded(true)}
         style={{opacity: loaded ? 1 : 0}}
+        unoptimized
       />
     </div>
   );
