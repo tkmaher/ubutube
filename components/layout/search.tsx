@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
 import { ReactLenis } from 'lenis/react'
 import { useRouter } from "next/navigation";
-import next from "next";
 
 const PER_PAGE = 50;
 
@@ -30,7 +29,7 @@ function buildTree(
                     children,
                 })),
             })
-        )
+        );
 
         if (!querying)
             children = children.sort((a, b) => a.name.localeCompare(b.name));
@@ -44,7 +43,7 @@ function buildTree(
             return acc;
         }, {} as Record<string, Record<string, SearchResult[]>>);
 
-        const children: SearchTreeYear[] = Object.entries(grouped).map(
+        let children: SearchTreeYear[] = Object.entries(grouped).map(
             ([year, artists]) => ({
                 year,
                 children: Object.entries(artists).map(([name, children]) => ({
@@ -52,10 +51,10 @@ function buildTree(
                     children,
                 })),
             })
-        )
+        );
 
         if (!querying)
-            children.sort((a, b) => a.year.localeCompare(b.year));
+            children = children.sort((a, b) => a.year.localeCompare(b.year));
 
         return { children: reverse ? children.reverse() : children };
     }
@@ -68,38 +67,33 @@ export default function Search() {
     const [reverse, setReverse] = useState(false);
     const [rawResults, setRawResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(true);
-
     const [page, setPage] = useState(0);
+    const [displayedQuery, setDisplayedQuery] = useState("");
 
     const router = useRouter();
 
     useEffect(() => {
-        if (searchQuery != searchQueryTmp && searchQueryTmp != "") return;
         setLoading(true);
         fetch(
             `https://ubu-worker.tomaszkkmaher.workers.dev/api/search?${new URLSearchParams(
-                { queryString: searchQueryTmp }
-            )}`, 
-            {next: { revalidate: 86400 }}
+                { queryString: searchQuery }
+            )}`,
+            { next: { revalidate: 86400 } }
         )
             .then(res => res.json())
-            .then(
-                (data: {
-                    cached: boolean;
-                    searchResults: SearchResult[];
-                    success: boolean;
-                }) => {
-                    if (data.success) setRawResults(data.searchResults);
-                    else console.error("Search API error:", data);
+            .then((data) => {
+                if (data.success) {
+                    setRawResults(data.searchResults);
+                    setDisplayedQuery(searchQuery);
                 }
-            )
+            })
             .catch(err => console.error("Search fetch error:", err))
             .finally(() => setLoading(false));
-    }, [searchQuery, searchQueryTmp]);
+    }, [searchQuery]);
 
     const searchResults = useMemo(
-        () => buildTree(rawResults, priority, reverse, searchQuery != ""),
-        [rawResults, priority, reverse]
+        () => buildTree(rawResults, priority, reverse, displayedQuery !== ""),
+        [rawResults, priority, reverse, displayedQuery]
     );
 
     useEffect(() => {
@@ -108,7 +102,6 @@ export default function Search() {
 
     return (
         <div className="right-bar">
-
             <div className="search-form">
                 <form
                     onSubmit={e => {
@@ -121,19 +114,23 @@ export default function Search() {
                         type="text"
                         placeholder="Search catalog..."
                         value={searchQueryTmp}
-                        onChange={e => setSearchQueryTmp(e.target.value)}
+                        onChange={e => {
+                            setSearchQueryTmp(e.target.value);
+                            if (e.target.value === "") setSearchQuery("");
+                        }}
                         id="search"
                         aria-label="search input"
-                        autoCorrect="off" 
-                        autoCapitalize="off" 
-                        spellCheck="false" 
-                        autoComplete="off" 
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck="false"
+                        autoComplete="off"
                     />
                     <button type="submit" aria-label="Search">→</button>
-                    <button onClick={() => {
-                        const randomFilm = rawResults[Math.floor(Math.random() * rawResults.length)];
-                        router.push(`/film/${randomFilm.id}`);
-                    }}
+                    <button
+                        onClick={() => {
+                            const randomFilm = rawResults[Math.floor(Math.random() * rawResults.length)];
+                            router.push(`/film/${randomFilm.id}`);
+                        }}
                         type="button"
                         aria-label="Random film"
                     >
@@ -143,73 +140,56 @@ export default function Search() {
 
                 <div className="search-row">
                     <button
-                        onClick={() => 
+                        onClick={() =>
                             setPriority(p => (p === "artist" ? "year" : "artist"))
                         }
                         className="sorter"
                         aria-label="List priority"
                     >
-                        {priority === "artist" ? (
-                            <>
-                                Artist→Year
-                            </>
-                        ) : (
-                            <>
-                                Year→Artist
-                            </>
-                        )}
+                        {priority === "artist" ? <>Artist→Year</> : <>Year→Artist</>}
                     </button>
-                    <button onClick={() => setReverse(r => !r)} className="orderer" aria-label="List precedence"> 
+                    <button onClick={() => setReverse(r => !r)} className="orderer" aria-label="List precedence">
                         {reverse
-                            ? priority === "artist"
-                                ? "Z→A"
-                                : "Newest→Oldest"
-                            : priority === "artist"
-                            ? "A→Z"
-                            : "Oldest→Newest"}
+                            ? priority === "artist" ? "Z→A" : "Newest→Oldest"
+                            : priority === "artist" ? "A→Z" : "Oldest→Newest"}
                     </button>
                 </div>
-                
-                
             </div>
 
             <ReactLenis
                 className="search-column"
                 style={{ opacity: loading ? 0 : 1 }}
                 options={{
-                    lerp: 0.1,      
+                    lerp: 0.1,
                     syncTouch: true,
                 }}
             >
-                {searchResults.children.length === 0 && <div className="tabs">(No results)</div>}
+                {!loading && searchResults.children.length === 0 && (
+                    <div className="tabs">(No results)</div>
+                )}
                 {priority === "artist"
-                    ? (searchResults.children as SearchTreeArtist[]).map(
-                          (artistGroup, i) => (
-                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
-                                  key={i}
-                                  mode="artist"
-                                  name={artistGroup.name}
-                                  yearGroups={
-                                      artistGroup.children as SearchTreeYear[]
-                                  }
-                                  query={searchQuery}
-                              />
-                            
-                          )
-                      )
-                    : (searchResults.children as SearchTreeYear[]).map(
-                          (yearGroup, i) => (
-                            (i >= PER_PAGE * page && i < PER_PAGE * (page+1)) && <GroupItem
-                                  key={i}
-                                  mode="year"
-                                  year={yearGroup.year}
-                                  artistGroups={
-                                      yearGroup.children as SearchTreeArtist[]
-                                  }
-                                  query={searchQuery}
-                              />
-                          )
-                      )}
+                    ? (searchResults.children as SearchTreeArtist[]).map((artistGroup, i) =>
+                        (i >= PER_PAGE * page && i < PER_PAGE * (page + 1)) && (
+                            <GroupItem
+                                key={i}
+                                mode="artist"
+                                name={artistGroup.name}
+                                yearGroups={artistGroup.children as SearchTreeYear[]}
+                                query={searchQuery}
+                            />
+                        )
+                    )
+                    : (searchResults.children as SearchTreeYear[]).map((yearGroup, i) =>
+                        (i >= PER_PAGE * page && i < PER_PAGE * (page + 1)) && (
+                            <GroupItem
+                                key={i}
+                                mode="year"
+                                year={yearGroup.year}
+                                artistGroups={yearGroup.children as SearchTreeArtist[]}
+                                query={searchQuery}
+                            />
+                        )
+                    )}
             </ReactLenis>
 
             <div className="search-form">
@@ -221,11 +201,9 @@ export default function Search() {
                     >
                         ←
                     </button>
-                    <span style={{textAlign: "center"}}>
+                    <span style={{ textAlign: "center" }}>
                         Page {page + 1} of{" "}
-                        {Math.ceil(
-                            searchResults.children.length / PER_PAGE
-                        ) || 1}
+                        {Math.ceil(searchResults.children.length / PER_PAGE) || 1}
                     </span>
                     <button
                         onClick={() =>
@@ -233,15 +211,12 @@ export default function Search() {
                                 Math.min(p + 1, Math.ceil(searchResults.children.length / PER_PAGE) - 1)
                             )
                         }
-                        disabled={
-                            page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1
-                        }
+                        disabled={page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1}
                         aria-label="Forward 1 page"
                     >
                         →
                     </button>
                 </div>
-                
             </div>
         </div>
     );

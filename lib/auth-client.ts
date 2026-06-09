@@ -9,7 +9,7 @@ const call = async (path: string, init?: RequestInit) => {
     ...init,
   });
   const data = await res.json();
-  console.log("API response:", { path, init, res, data });
+  // console.log("API response:", { path, init, res, data });
   if (!res.ok) throw new Error(data.error ?? "Request failed");
   return data;
 };
