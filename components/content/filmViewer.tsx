@@ -231,8 +231,8 @@ export default function FilmViewer({
             {loading && <div className="loader">Loading...</div>}
             <div className="viewer-title">
                 <div>{filmData.name}</div>
+                <div className="views">{views} {views !== 1 ? "views" : "view"}</div>
                 <div className="stats">
-                    <div>{views} {views !== 1 ? "views" : "view"}</div>
                     <VideoButton
                         buttonText={isBookmarked ? "Remove from bookmarks" : "Bookmark"}
                         text1={isBookmarked ? "Remove from bookmarks" : "Bookmark this video"}
