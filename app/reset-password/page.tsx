@@ -62,7 +62,7 @@ function ResetContent() {
           />
         </label>
 
-        <button type="submit" className="auth-btn ubu-linkout" disabled={loading}>
+        <button type="submit" className="auth-btn ubu-linkout" disabled={loading} aria-label="Reset password">
           {loading ? "Resetting…" : "Set new password"}
         </button>
       </form>

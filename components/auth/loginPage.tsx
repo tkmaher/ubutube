@@ -60,12 +60,15 @@ export default function LoginPage() {
 
         <Link href="/forgot-password" className="linkout ubu-linkout">Forgot password?</Link>
 
-          <button type="submit" className="ubu-linkout" disabled={loading}>
+          <button type="submit" className="ubu-linkout" disabled={loading} aria-label="Log in">
             {loading ? "Logging in…" : "Log in"}
           </button>
         </form>
         <div>
-          No account? <button onClick={() => router.push("/signup")}>Sign up</button>
+          No account? 
+          <button onClick={() => router.push("/signup")} aria-label="Sign up">
+            Sign up
+          </button>
         </div>
 
     </>

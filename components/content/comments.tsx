@@ -169,7 +169,14 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
                         onChange={e => setCurrComment(e.target.value)}
                         id="comment"
                     />
-                    <button type="submit" className="comment-submit" disabled={submitting}>Submit</button>
+                    <button 
+                        type="submit" 
+                        className="comment-submit" 
+                        disabled={submitting} 
+                        aria-label="Submit comment"
+                    >
+                        Submit
+                    </button>
                     <div>{error}</div>
                 </form>
             </div>

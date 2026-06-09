@@ -48,6 +48,7 @@ function VideoButton({
                 if (callback) callback();
             }}
             onMouseOut={() => setUseText1(true)}
+            aria-label={text1}
         >
             {buttonText}
             <Tooltip text={useText1 ? text1 : text2} />
@@ -275,8 +276,8 @@ export default function FilmViewer({
                 </a>
                 {filmData.bySameArtist.length > 1 && (
                     <div className="nav-bar">
-                        <a onClick={() => nav("back")} className="linkout">Previous</a>
-                        <a onClick={() => nav("forward")} className="linkout">Next</a>
+                        <a onClick={() => nav("back")} className="linkout" aria-label="Previous film">Previous</a>
+                        <a onClick={() => nav("forward")} className="linkout" aria-label="Next film">Next</a>
                     </div>
                 )}
             </div>

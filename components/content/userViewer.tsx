@@ -68,7 +68,9 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
     if (!user) return (
         <>
             <div>Error: you are not logged in.</div>
-            <button onClick={() => router.push("/login")} className="ubu-linkout">Log in</button>
+            <button onClick={() => router.push("/login")} className="ubu-linkout" aria-label="Log in">
+                Log in
+            </button>
         </>
     );
 
@@ -88,16 +90,18 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
                     />
                 </label>
                 {submitText && <div>{submitText}</div>}
-                <button type="submit" className="ubu-linkout" disabled={loading}>
+                <button type="submit" className="ubu-linkout" disabled={loading} aria-label="Submit edits">
                     {loading ? "Working…" : "Submit"}
                 </button>
             </form>
 
             <form className="auth-form" onSubmit={handleDelete}>
                 <button className="ubu-linkout" onClick={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    setDeleting(old => !old);
-                }}>
+                        e.preventDefault();
+                        setDeleting(old => !old);
+                    }}
+                    aria-label="Delete account"
+                >
                     Delete account
                 </button>
                 {deleting && 
@@ -113,6 +117,7 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
                             className="ubu-linkout" type="submit"
                             disabled={loading}
                             style={{ color: "tomato" }}
+                            aria-label="Confirm account deletion"
                         >
                             Delete account forever
                         </button>
@@ -309,7 +314,11 @@ export default function UserViewer({ slug, initialData }: { slug: string; initia
             <div className="viewer-title">
                 {userData?.username} — User since {userData && formatToMMDDYYYY(userData.created_at)}
                 {userData?.username === user?.username && (
-                    <button className="ubu-linkout" onClick={() => setEditing(old => !old)}>
+                    <button 
+                        className="ubu-linkout" 
+                        onClick={() => setEditing(old => !old)}
+                        aria-label="Edit profile"
+                    >
                         {editing ? "Go back" : "Edit profile"}
                     </button>
                 )}

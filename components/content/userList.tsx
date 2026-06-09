@@ -44,7 +44,7 @@ export default function UserListViewer({ initialData, page, order }: {
                 <div>
                     Users ({userList?.totalUsers ?? "?"} user{userList?.totalUsers === 1 ? "" : "s"})
                 </div>
-                <button>
+                <button aria-label="Sort list">
                     <Link href={`/userlist?page=1&order=${order === "asc" ? "desc" : "asc"}`} className="linkout ubu-linkout">
                         {order === "asc" ? "Newest first" : "Oldest first"}
                     </Link>
@@ -63,7 +63,11 @@ export default function UserListViewer({ initialData, page, order }: {
             <div className="content-footer">
                 <div className="search-row">
                     {page <= 1 ? <div></div> :
-                        <Link href={`/userlist?page=1&order=${order}`} className="linkout ubu-linkout">
+                        <Link 
+                            href={`/userlist?page=1&order=${order}`} 
+                            className="linkout ubu-linkout" 
+                            aria-label="Previous page"
+                        >
                             ←
                         </Link>
                     }
@@ -71,8 +75,11 @@ export default function UserListViewer({ initialData, page, order }: {
                             Page {page} of{" "}{userList?.totalPages ?? "?"}
                         </span>
                     {(userList && page >= userList?.totalPages) ? <div></div> :
-                        <Link href={`/userlist?page=${page + 1}&order=${order}`} className="linkout ubu-linkout"
-                            style={{pointerEvents: page >= Math.ceil((userList?.totalUsers ?? 0) / 50) - 1 ? "none" : undefined}}
+                        <Link 
+                            href={`/userlist?page=${page + 1}&order=${order}`} 
+                            className="linkout ubu-linkout"
+                            style={{pointerEvents: page > (userList?.totalPages ?? 0) ? "none" : undefined}}
+                            aria-label="Next page"
                         >
                             →
                         </Link>

@@ -25,9 +25,21 @@ a, a:visited, a:hover, a:active {
   color: $foreground;
   text-decoration: none;
 }
-
 .main {
   flex-grow: 1;
+}
+
+.main-home {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    max-width: calc(100% - 0.4em);
+    height: auto;
+    margin: 0.2em;
+    transition: opacity 0.2s ease-in-out;
+  }
 }
 
 input[type="text"], button {
@@ -201,7 +213,7 @@ button {
     font-size: 20px !important;
   }
   button, input[type="text"] {
-    font-size: 22px !important;
+    font-size: 20px !important;
   }
 
   button:active {

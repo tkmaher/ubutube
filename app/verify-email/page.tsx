@@ -27,7 +27,9 @@ function VerifyContent() {
       {status === "success" && (
         <>
           <div className="auth-message auth-message--success">✓ Email verified! You can now log in.</div>
-          <button onClick={() => router.push("/login")} className="ubu-linkout">Log in</button>
+          <button onClick={() => router.push("/login")} className="ubu-linkout" aria-label="Log in">
+            Log in
+          </button>
         </>
       )}
 

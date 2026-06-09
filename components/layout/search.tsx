@@ -122,7 +122,7 @@ export default function Search() {
                         id="search"
                         aria-label="search input"
                     />
-                    <button type="submit">→</button>
+                    <button type="submit" aria-label="Search">→</button>
                     <button onClick={() => {
                         const randomFilm = rawResults[Math.floor(Math.random() * rawResults.length)];
                         router.push(`/film/${randomFilm.id}`);
@@ -140,6 +140,7 @@ export default function Search() {
                             setPriority(p => (p === "artist" ? "year" : "artist"))
                         }
                         className="sorter"
+                        aria-label="List priority"
                     >
                         {priority === "artist" ? (
                             <>
@@ -151,7 +152,7 @@ export default function Search() {
                             </>
                         )}
                     </button>
-                    <button onClick={() => setReverse(r => !r)} className="orderer">
+                    <button onClick={() => setReverse(r => !r)} className="orderer" aria-label="List precedence"> 
                         {reverse
                             ? priority === "artist"
                                 ? "Z→A"
@@ -209,6 +210,7 @@ export default function Search() {
                     <button
                         onClick={() => setPage(p => Math.max(0, p - 1))}
                         disabled={page === 0}
+                        aria-label="Back 1 page"
                     >
                         ←
                     </button>
@@ -227,6 +229,7 @@ export default function Search() {
                         disabled={
                             page >= Math.ceil(searchResults.children.length / PER_PAGE) - 1
                         }
+                        aria-label="Forward 1 page"
                     >
                         →
                     </button>

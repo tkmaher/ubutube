@@ -72,13 +72,16 @@ export default function SignupPage() {
             />
           </label>
 
-          <button type="submit" className="ubu-linkout" disabled={loading}>
+          <button type="submit" className="ubu-linkout" disabled={loading} aria-label="Create account">
             {loading ? "Creating account…" : "Create account"}
           </button>
         </form>
 
         <div>
-          Already have an account? <button onClick={() => router.push("/login")}>Log in</button>
+          Already have an account? 
+          <button onClick={() => router.push("/login")} aria-label="Log in">
+            Log in
+          </button>
         </div>
     </div>
   );

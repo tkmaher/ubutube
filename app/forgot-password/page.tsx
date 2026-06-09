@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
                 onChange={e => setEmail(e.target.value)} id="email"
               />
             </label>
-            <button type="submit" className="ubu-linkout" disabled={loading}>
+            <button type="submit" className="ubu-linkout" disabled={loading} aria-label="send reset link">
               {loading ? "Sending…" : "Send reset link"}
             </button>
           </form>
