@@ -4,7 +4,14 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
   images: {
-    remotePatterns: [new URL('https://upload.wikimedia.org/**')],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org', // Replace with your exact domain
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
