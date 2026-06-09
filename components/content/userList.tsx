@@ -22,7 +22,7 @@ export default function UserListViewer({ initialData, page, order }: {
     useEffect(() => {
         if (initialData) return;
         setLoading(true);
-        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/userList?page=${page ?? 1}&order=${order}`)
+        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/userList?page=${page ?? 1}&order=${order}`, {next: { revalidate: 3600 }} )
             .then(res => res.json())
             .then((data: { cached: boolean; userList: UserList; success: boolean }) => {
                 console.log(`Fetched user list for page ${page} and order ${order}. Got:`, data);

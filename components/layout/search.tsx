@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { GroupItem } from "@/components/layout/groupitem";
 import { ReactLenis } from 'lenis/react'
 import { useRouter } from "next/navigation";
+import next from "next";
 
 const PER_PAGE = 50;
 
@@ -73,11 +74,13 @@ export default function Search() {
     const router = useRouter();
 
     useEffect(() => {
+        if (searchQuery != searchQueryTmp && searchQueryTmp != "") return;
         setLoading(true);
         fetch(
             `https://ubu-worker.tomaszkkmaher.workers.dev/api/search?${new URLSearchParams(
-                { queryString: searchQuery }
-            )}`
+                { queryString: searchQueryTmp }
+            )}`, 
+            {next: { revalidate: 86400 }}
         )
             .then(res => res.json())
             .then(
@@ -92,7 +95,7 @@ export default function Search() {
             )
             .catch(err => console.error("Search fetch error:", err))
             .finally(() => setLoading(false));
-    }, [searchQuery]);
+    }, [searchQuery, searchQueryTmp]);
 
     const searchResults = useMemo(
         () => buildTree(rawResults, priority, reverse, searchQuery != ""),

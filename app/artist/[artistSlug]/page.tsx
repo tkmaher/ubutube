@@ -6,9 +6,10 @@ import { Artist } from "@/types/objects";
 
 const getArtistData = cache(async (artistSlug: string): Promise<Artist | null> => {
     const res = await fetch(
-        `https://ubu-worker.tomaszkkmaher.workers.dev/api/artists/${artistSlug}`
-        );
-        const data: { cached: boolean; artist: Artist; success: boolean } = await res.json();
+        `https://ubu-worker.tomaszkkmaher.workers.dev/api/artists/${artistSlug}`,
+        {next: { revalidate: 86400 }} 
+    );
+    const data: { cached: boolean; artist: Artist; success: boolean } = await res.json();
     return data.success ? data.artist : null;
 });
 
