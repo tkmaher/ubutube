@@ -52,6 +52,9 @@ export default function SignupPage() {
               type="username" value={username} required minLength={3} maxLength={32}
               autoComplete="username" placeholder="3–32 characters"
               onChange={e => setUsername(e.target.value)} id="username"
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false" 
             />
           </label>
 
@@ -60,6 +63,9 @@ export default function SignupPage() {
             <input
               type="email" value={email} required autoComplete="email"
               onChange={e => setEmail(e.target.value)} id="email"
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false" 
             />
           </label>
 
@@ -69,6 +75,9 @@ export default function SignupPage() {
               type="password" value={password} required minLength={8}
               autoComplete="new-password" placeholder="Minimum 8 characters"
               onChange={e => setPassword(e.target.value)} id="password"
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false" 
             />
           </label>
 

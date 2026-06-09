@@ -47,6 +47,9 @@ export default function LoginPage() {
             <input
               type="email" value={email} required autoComplete="email"
               onChange={e => setEmail(e.target.value)} id="email"
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false" 
             />
           </label>
 
@@ -55,6 +58,9 @@ export default function LoginPage() {
             <input
               type="password" value={password} required autoComplete="current-password"
               onChange={e => setPassword(e.target.value)} id="password"
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false" 
             />
           </label>
 

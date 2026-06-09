@@ -81,6 +81,40 @@ function formatTime(s: number): string {
 
 function toErr(e: unknown): string { return e instanceof Error ? e.message : String(e); }
 
+// ─── useCursorHide ────────────────────────────────────────────────────────────
+// Returns a ref to attach to the container and a boolean for whether cursor is hidden.
+// Hides the cursor after HIDE_DELAY ms of inactivity inside the container.
+function useCursorHide(playing: boolean, isIframe: boolean) {
+  const [cursorHidden, setCursorHidden] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const HIDE_DELAY = 2000;
+
+  const armHide = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (playing && !isIframe) {
+      timerRef.current = setTimeout(() => setCursorHidden(true), HIDE_DELAY);
+    }
+  }, [playing, isIframe]);
+
+  const onActivity = useCallback(() => {
+    setCursorHidden(false);
+    armHide();
+  }, [armHide]);
+
+  // When paused or iframe, always show cursor and cancel timer
+  useEffect(() => {
+    if (!playing || isIframe) {
+      setCursorHidden(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    } else {
+      armHide();
+    }
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [playing, isIframe, armHide]);
+
+  return { cursorHidden, onActivity };
+}
+
 // ─── useChromecast ────────────────────────────────────────────────────────────
 function useChromecast(src: string) {
   const [castState, setCastState] = useState<CastState>('NO_DEVICES_AVAILABLE');
@@ -225,17 +259,28 @@ function useVideoControls(
   const [muted,       setMuted]       = useState(false);
   const [buffering,   setBuffering]   = useState(false);
 
+  // Use rAF to throttle timeupdate so we only update state once per frame
+  const rafRef = useRef<number | null>(null);
+
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !ready) return;
-    const onPlay     = () => setPlaying(true);
-    const onPause    = () => setPlaying(false);
-    const onTime     = () => setCurrentTime(el.currentTime);
-    const onDur      = () => setDuration(isFinite(el.duration) ? el.duration : 0);
-    const onVol      = () => { setVolumeState(el.volume); setMuted(el.muted); };
-    const onWait     = () => setBuffering(true);
-    const onPlaying  = () => setBuffering(false);
-    const onSeeked   = () => setBuffering(false);
+
+    const onPlay    = () => setPlaying(true);
+    const onPause   = () => setPlaying(false);
+    const onTime    = () => {
+      if (rafRef.current !== null) return; // already scheduled
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        setCurrentTime(el.currentTime);
+      });
+    };
+    const onDur     = () => setDuration(isFinite(el.duration) ? el.duration : 0);
+    const onVol     = () => { setVolumeState(el.volume); setMuted(el.muted); };
+    const onWait    = () => setBuffering(true);
+    const onPlaying = () => setBuffering(false);
+    const onSeeked  = () => { setBuffering(false); setCurrentTime(el.currentTime); };
+
     el.addEventListener('play',           onPlay);
     el.addEventListener('pause',          onPause);
     el.addEventListener('timeupdate',     onTime);
@@ -245,12 +290,15 @@ function useVideoControls(
     el.addEventListener('waiting',        onWait);
     el.addEventListener('playing',        onPlaying);
     el.addEventListener('seeked',         onSeeked);
+
     setPlaying(!el.paused);
     setCurrentTime(el.currentTime);
     setDuration(isFinite(el.duration) ? el.duration : 0);
     setVolumeState(el.volume);
     setMuted(el.muted);
+
     return () => {
+      if (rafRef.current !== null) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
       el.removeEventListener('play',           onPlay);
       el.removeEventListener('pause',          onPause);
       el.removeEventListener('timeupdate',     onTime);
@@ -312,6 +360,66 @@ function useControlsVisibility(playing: boolean) {
   return { visible, show };
 }
 
+// ─── useFullscreen ────────────────────────────────────────────────────────────
+// Cross-platform fullscreen: prefers container requestFullscreen, falls back to
+// video.webkitEnterFullscreen for iOS Safari which only supports it on <video>.
+function useFullscreen(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  videoRef:     React.RefObject<HTMLVideoElement | null>,
+) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const onFsChange = () => {
+      // Both standard and webkit variants
+      const fsEl = document.fullscreenElement
+        || (document as CastAny).webkitFullscreenElement
+        || null;
+      setIsFullscreen(!!fsEl);
+    };
+    document.addEventListener('fullscreenchange',       onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    // iOS fires this on the video element
+    const vid = videoRef.current;
+    if (vid) {
+      vid.addEventListener('webkitbeginfullscreen', () => setIsFullscreen(true));
+      vid.addEventListener('webkitendfullscreen',   () => setIsFullscreen(false));
+    }
+    return () => {
+      document.removeEventListener('fullscreenchange',       onFsChange);
+      document.removeEventListener('webkitfullscreenchange', onFsChange);
+    };
+  }, [videoRef]);
+
+  const toggleFullscreen = useCallback(() => {
+    const container = containerRef.current;
+    const video     = videoRef.current;
+
+    if (isFullscreen) {
+      // Exit
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as CastAny).webkitExitFullscreen) {
+        (document as CastAny).webkitExitFullscreen();
+      } else if (video && (video as CastAny).webkitExitFullscreen) {
+        (video as CastAny).webkitExitFullscreen();
+      }
+    } else {
+      // Enter — try container first (Android/desktop), fall back to video (iOS)
+      if (container?.requestFullscreen) {
+        container.requestFullscreen();
+      } else if ((container as CastAny)?.webkitRequestFullscreen) {
+        (container as CastAny).webkitRequestFullscreen();
+      } else if (video && (video as CastAny).webkitEnterFullscreen) {
+        // iOS Safari: only <video> supports native fullscreen
+        (video as CastAny).webkitEnterFullscreen();
+      }
+    }
+  }, [containerRef, videoRef, isFullscreen]);
+
+  return { isFullscreen, toggleFullscreen };
+}
+
 // ─── icons ────────────────────────────────────────────────────────────────────
 const SV = {
   width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none',
@@ -357,40 +465,95 @@ function CtrlBtn({ onClick, label, children, active = false }: {
 }
 
 // ─── ProgressBar ─────────────────────────────────────────────────────────────
+// Smooth scrubbing: all drag math runs imperatively against the DOM, bypassing
+// React state. State is only updated on pointer-up (or on the rAF-throttled
+// timeupdate path when not dragging).
 function ProgressBar({ currentTime, duration, onSeek }: {
   currentTime: number; duration: number; onSeek: (t: number) => void;
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
+  const trackRef  = useRef<HTMLDivElement>(null);
+  const fillRef   = useRef<HTMLDivElement>(null);
+  const thumbRef  = useRef<HTMLDivElement>(null);
+  const dragging  = useRef(false);
   const [hov, setHov] = useState(false);
-  const pct = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
 
-  const toTime = (clientX: number) => {
+  // Keep a ref to the latest duration so pointer callbacks don't stale-close
+  const durationRef = useRef(duration);
+  useEffect(() => { durationRef.current = duration; }, [duration]);
+
+  // Imperatively sync fill/thumb when NOT dragging (driven by rAF timeupdate)
+  const pct = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
+  useEffect(() => {
+    if (dragging.current) return;
+    applyPct(pct);
+  });
+
+  function applyPct(p: number) {
+    const pStr = `${p * 100}%`;
+    if (fillRef.current)  fillRef.current.style.width = pStr;
+    if (thumbRef.current) thumbRef.current.style.left  = pStr;
+  }
+
+  const toTime = (clientX: number): number => {
     const rect = trackRef.current?.getBoundingClientRect();
     if (!rect) return 0;
-    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * duration;
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * durationRef.current;
   };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragging.current = true;
+    const t = toTime(e.clientX);
+    applyPct(durationRef.current > 0 ? t / durationRef.current : 0);
+    onSeek(t);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    const t = toTime(e.clientX);
+    // Imperatively update visuals — no setState, no re-render
+    applyPct(durationRef.current > 0 ? t / durationRef.current : 0);
+    onSeek(t);
+  };
+
+  const onPointerUp = () => { dragging.current = false; };
 
   return (
     <div ref={trackRef}
-      onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); dragging.current = true; onSeek(toTime(e.clientX)); }}
-      onPointerMove={e => { if (dragging.current) onSeek(toTime(e.clientX)); }}
-      onPointerUp={() => { dragging.current = false; }}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{ position: 'relative', width: '100%', height: hov ? 20 : 14,
-               display: 'flex', alignItems: 'center', cursor: 'pointer', transition: 'height 0.15s' }}>
-      <div style={{ position: 'absolute', left: 0, right: 0, height: hov ? 5 : 3,
-                    borderRadius: 99, background: 'rgba(255,255,255,0.2)',
-                    transition: 'height 0.15s', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0,
-                      width: `${pct * 100}%`, background: 'white' }} />
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        position: 'relative', width: '100%', height: hov ? 20 : 14,
+        display: 'flex', alignItems: 'center', cursor: 'pointer',
+        transition: 'height 0.15s',
+        // Expand touch target without affecting layout
+        touchAction: 'none',
+      }}>
+      <div style={{
+        position: 'absolute', left: 0, right: 0, height: hov ? 5 : 3,
+        borderRadius: 99, background: 'rgba(255,255,255,0.2)',
+        transition: 'height 0.15s', overflow: 'hidden',
+      }}>
+        <div ref={fillRef} style={{
+          position: 'absolute', left: 0, top: 0, bottom: 0,
+          width: `${pct * 100}%`, background: 'white',
+          // GPU-composited — avoids layout during drag
+          willChange: 'width',
+        }} />
       </div>
-      <div style={{ position: 'absolute', left: `${pct * 100}%`,
-                    width: hov ? 13 : 0, height: hov ? 13 : 0, marginLeft: hov ? -6.5 : 0,
-                    background: 'white', borderRadius: '50%',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                    transition: 'width 0.15s, height 0.15s, margin 0.15s',
-                    pointerEvents: 'none' }} />
+      <div ref={thumbRef} style={{
+        position: 'absolute', left: `${pct * 100}%`,
+        width: hov ? 13 : 0, height: hov ? 13 : 0,
+        marginLeft: hov ? -6.5 : 0,
+        background: 'white', borderRadius: '50%',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+        transition: 'width 0.15s, height 0.15s, margin 0.15s',
+        pointerEvents: 'none',
+        willChange: 'left',
+      }} />
     </div>
   );
 }
@@ -420,7 +583,7 @@ function VolumeControl({ volume, muted, onVolume, onMute }: {
              onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); dragging.current = true; onVolume(toVol(e.clientX)); }}
              onPointerMove={e => { if (dragging.current) onVolume(toVol(e.clientX)); }}
              onPointerUp={() => { dragging.current = false; }}
-             style={{ width: 68, height: 20, flexShrink: 0, display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+             style={{ width: 68, height: 20, flexShrink: 0, display: 'flex', alignItems: 'center', cursor: 'pointer', touchAction: 'none' }}>
           <div style={{ position: 'relative', width: '100%', height: 3,
                         background: 'rgba(255,255,255,0.2)', borderRadius: 99, overflow: 'hidden' }}>
             <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0,
@@ -445,15 +608,7 @@ function VideoControls({ videoRef, containerRef, ready, visible, castState, cast
   const { playing, currentTime, duration, volume, muted, buffering,
           togglePlay, seek, setVolume, toggleMute } = useVideoControls(videoRef, ready);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  useEffect(() => {
-    const h = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', h);
-    return () => document.removeEventListener('fullscreenchange', h);
-  }, []);
-
-  const toggleFullscreen = () =>
-    document.fullscreenElement ? document.exitFullscreen() : containerRef.current?.requestFullscreen();
+  const { isFullscreen, toggleFullscreen } = useFullscreen(containerRef, videoRef);
 
   const showCast    = castReady && castState !== 'NO_DEVICES_AVAILABLE';
   const castOn      = castState === 'CONNECTED';
@@ -524,7 +679,7 @@ export default function VideoStream({
   const { castState, castReady, requestCast } = useChromecast(src);
 
   const isIframe      = type === 'iframe';
-  const isUnsupported = type === 'unsupported';  
+  const isUnsupported = type === 'unsupported';
 
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
@@ -536,8 +691,16 @@ export default function VideoStream({
     return () => { el.removeEventListener('play', on); el.removeEventListener('pause', off); };
   }, [videoRef, ready]);
 
-  const containerRef      = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const { visible, show } = useControlsVisibility(playing);
+  const { cursorHidden, onActivity } = useCursorHide(playing, isIframe);
+
+  // Combined handler: show controls AND reset cursor hide timer
+  const handleActivity = useCallback(() => {
+    show();
+    onActivity();
+  }, [show, onActivity]);
 
   const FORM_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -549,7 +712,17 @@ export default function VideoStream({
       case 'ArrowRight': e.preventDefault(); if (el) el.currentTime = Math.min(el.duration || 0, el.currentTime + 5); break;
       case 'm': case 'M': e.preventDefault(); if (el) el.muted = !el.muted; break;
       case 'f': case 'F': e.preventDefault();
-        document.fullscreenElement ? document.exitFullscreen() : containerRef.current?.requestFullscreen(); break;
+        // Fullscreen via keyboard — delegate to the hook inside VideoControls.
+        // We re-implement the toggle logic here so the keyboard shortcut still works.
+        if (document.fullscreenElement || (document as CastAny).webkitFullscreenElement) {
+          (document.exitFullscreen || (document as CastAny).webkitExitFullscreen)?.call(document);
+        } else {
+          const c = containerRef.current;
+          if (c?.requestFullscreen) c.requestFullscreen();
+          else if ((c as CastAny)?.webkitRequestFullscreen) (c as CastAny).webkitRequestFullscreen();
+          else if (el && (el as CastAny).webkitEnterFullscreen) (el as CastAny).webkitEnterFullscreen();
+        }
+        break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoRef, containerRef, isIframe]);
@@ -562,10 +735,16 @@ export default function VideoStream({
         .vs-root:focus-visible { box-shadow: 0 0 0 2px rgba(255,255,255,0.45); }
       `}</style>
       <div ref={containerRef} className={`vs-root ${className}`} tabIndex={0}
-           onKeyDown={handleKeyDown} onMouseMove={show} onTouchStart={show}
+           onKeyDown={handleKeyDown}
+           onMouseMove={handleActivity}
+           onTouchStart={handleActivity}
            aria-label="Video player"
-           style={{ aspectRatio, position: 'relative', background: '#000',
-                    borderRadius: 'inherit', overflow: 'hidden' }}>
+           style={{
+             aspectRatio, position: 'relative', background: '#000',
+             borderRadius: 'inherit', overflow: 'hidden',
+             // Hide cursor after inactivity while playing
+             cursor: cursorHidden ? 'none' : undefined,
+           }}>
 
         {(!ready || error) && !isUnsupported && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 5,
@@ -605,8 +784,8 @@ export default function VideoStream({
         <video ref={videoRef}
           style={{
             position: 'absolute', inset: 0,
-            width:   isIframe ? 0 : '100%',
-            height:  isIframe ? 0 : '100%',
+            width:      isIframe ? 0 : '100%',
+            height:     isIframe ? 0 : '100%',
             opacity: 1,
             transition: 'opacity 0.2s',
             visibility: isIframe ? 'hidden' : 'visible',

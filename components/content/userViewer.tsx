@@ -81,12 +81,18 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
                     <div>Username</div>
                     <input type="username" value={username} required autoComplete="username"
                         onChange={e => setUsername(e.target.value)} id="username"
+                        autoCorrect="off" 
+                        autoCapitalize="off" 
+                        spellCheck="false" 
                     />
                 </label>
                 <label>
                     <div>Link</div>
                     <input type="link" value={link} autoComplete="link"
                         onChange={e => setLink(e.target.value)} id="link"
+                        autoCorrect="off" 
+                        autoCapitalize="off" 
+                        spellCheck="false" 
                     />
                 </label>
                 {submitText && <div>{submitText}</div>}
@@ -110,6 +116,9 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
                             <div>Password</div>
                             <input type="password" value={password} autoComplete="password" required
                                 onChange={e => setPassword(e.target.value)} id="confirm-delete"
+                                autoCorrect="off" 
+                                autoCapitalize="off" 
+                                spellCheck="false" 
                             />
                         </label>
                         {deleteText && <div>{deleteText}</div>}

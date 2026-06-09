@@ -30,6 +30,9 @@ export default function ForgotPasswordPage() {
               <input
                 type="email" value={email} required autoComplete="email"
                 onChange={e => setEmail(e.target.value)} id="email"
+                autoCorrect="off" 
+                autoCapitalize="off" 
+                spellCheck="false" 
               />
             </label>
             <button type="submit" className="ubu-linkout" disabled={loading} aria-label="send reset link">

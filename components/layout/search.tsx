@@ -121,6 +121,10 @@ export default function Search() {
                         onChange={e => setSearchQueryTmp(e.target.value)}
                         id="search"
                         aria-label="search input"
+                        autoCorrect="off" 
+                        autoCapitalize="off" 
+                        spellCheck="false" 
+                        autoComplete="off" 
                     />
                     <button type="submit" aria-label="Search">→</button>
                     <button onClick={() => {
@@ -214,7 +218,7 @@ export default function Search() {
                     >
                         ←
                     </button>
-                    <span>
+                    <span style={{textAlign: "center"}}>
                         Page {page + 1} of{" "}
                         {Math.ceil(
                             searchResults.children.length / PER_PAGE

@@ -50,6 +50,9 @@ function ResetContent() {
             type="password" value={password} required minLength={8}
             autoComplete="new-password" placeholder="Minimum 8 characters"
             onChange={e => setPassword(e.target.value)} id="new-password"
+            autoCorrect="off" 
+            autoCapitalize="off" 
+            spellCheck="false" 
           />
         </label>
 
@@ -59,6 +62,9 @@ function ResetContent() {
             type="password" value={confirm} required minLength={8}
             autoComplete="new-password"
             onChange={e => setConfirm(e.target.value)} id="confirm-password"
+            autoCorrect="off" 
+            autoCapitalize="off" 
+            spellCheck="false" 
           />
         </label>
 
