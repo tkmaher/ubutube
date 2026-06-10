@@ -168,6 +168,7 @@ export default function FilmViewer({
     };
 
     const bookmarkCallback = useCallback(async () => {
+        if (!filmData.id) return;
         if (!user || !bookmarks) {
             router.push("/login");
             return;
