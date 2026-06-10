@@ -16,12 +16,20 @@ function UserEditor({ submitCallback }: { submitCallback: (newLink: string) => v
     const { user, setUser } = useAuth();
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
-    const [username, setUsername] = useState(user?.username);
-    const [link, setLink] = useState(user?.link ?? "");
     const [submitText, setSubmitText] = useState<string | null>(null);
     const [deleteText, setDeleteText] = useState<string | null>(null);
     const [password, setPassword] = useState("");
     const router = useRouter();
+
+    const [link, setLink] = useState(user?.link ?? "");
+    const [username, setUsername] = useState(user?.username ?? "");
+
+    useEffect(() => {
+    if (user) {
+        setLink(user.link ?? "");
+        setUsername(user.username ?? "");
+    }
+    }, [user]);
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
@@ -182,7 +190,7 @@ function BookmarkDisplay({ currentBookmarks, setCurrentBookmarks, userData }: {
                                     {user?.username === userData.username && (
                                         <div className="linkout button"
                                             onClick={() => { if (!deleting) bookmarkCallback(bookmark); }}>
-                                            Remove bookmark
+                                            Remove
                                         </div>
                                     )}
                                 </div>
@@ -255,7 +263,7 @@ function CommentDisplay({ userData, setUserData }: {
                                         {user?.username === userData.username && (
                                             <div className="linkout button"
                                                 onClick={() => { if (!deleting) commentCallback(commentIn); }}>
-                                                Delete comment
+                                                Delete
                                             </div>
                                         )}
                                     </div>

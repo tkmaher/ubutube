@@ -53,9 +53,14 @@
 
         .stats {
             width: 100%;
+            align-items: flex-end;
 
             div {
                 flex-grow: 1;
+            }
+
+            button {
+                text-align: left;
             }
         }
     }
@@ -251,10 +256,11 @@
     }
 
     @media (max-width: 800px) {
-        &:active {
-            .button {
-                opacity: 1;
-            }
+
+        .button {
+            opacity: 1 !important;
+            text-align: right;
+            flex-shrink: 0;
         }
     }
 }
