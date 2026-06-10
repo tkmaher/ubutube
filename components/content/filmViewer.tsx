@@ -127,7 +127,8 @@ export default function FilmViewer({
     }, []);
 
     useEffect(() => {
-        if (bookmarks) setIsBookmarked(bookmarks.includes(bookmarkSlug));
+        if (!bookmarks || !filmData.id) return;
+        setIsBookmarked(bookmarks.includes(bookmarkSlug));
     }, [bookmarks, bookmarkSlug]);
 
     useEffect(() => {
@@ -175,7 +176,6 @@ export default function FilmViewer({
             ? bookmarks.filter(n => n !== bookmarkSlug)
             : [...bookmarks, bookmarkSlug];
         setBookmarks(newBookmarks);
-        setIsBookmarked(old => !old);
         await modifyBookmark(newBookmarks.join(","));
         await revalidateUserCache(user.username);
     }, [bookmarks, bookmarkSlug, setBookmarks, router, user]);
