@@ -82,8 +82,6 @@ function formatTime(s: number): string {
 function toErr(e: unknown): string { return e instanceof Error ? e.message : String(e); }
 
 // ─── useCursorHide ────────────────────────────────────────────────────────────
-// Returns a ref to attach to the container and a boolean for whether cursor is hidden.
-// Hides the cursor after HIDE_DELAY ms of inactivity inside the container.
 function useCursorHide(playing: boolean, isIframe: boolean) {
   const [cursorHidden, setCursorHidden] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -101,7 +99,6 @@ function useCursorHide(playing: boolean, isIframe: boolean) {
     armHide();
   }, [armHide]);
 
-  // When paused or iframe, always show cursor and cancel timer
   useEffect(() => {
     if (!playing || isIframe) {
       setCursorHidden(false);
@@ -122,24 +119,41 @@ function useChromecast(src: string) {
 
   const initCtx = useCallback((fw: CastAny) => {
     const ctx = fw.CastContext.getInstance();
-    ctx.setOptions({ receiverApplicationId: CAST_APP_ID,
-      autoJoinPolicy: (window as CastAny).chrome?.cast?.AutoJoinPolicy?.ORIGIN_SCOPED });
+    ctx.setOptions({
+      receiverApplicationId: CAST_APP_ID,
+      autoJoinPolicy: (window as CastAny).chrome?.cast?.AutoJoinPolicy?.ORIGIN_SCOPED,
+    });
     setCastState((ctx.getCastState?.() ?? 'NO_DEVICES_AVAILABLE') as CastState);
     setCastReady(true);
-    ctx.addEventListener(fw.CastContextEventType.CAST_STATE_CHANGED,
-      (e: CastAny) => setCastState((e.castState ?? 'NO_DEVICES_AVAILABLE') as CastState));
+    ctx.addEventListener(
+      fw.CastContextEventType.CAST_STATE_CHANGED,
+      (e: CastAny) => setCastState((e.castState ?? 'NO_DEVICES_AVAILABLE') as CastState),
+    );
   }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Helper: try to init from already-loaded framework, retry once if not yet ready
+    const tryInit = (retries = 3) => {
+      const fw = (window as CastAny).cast?.framework;
+      if (fw) { initCtx(fw); return; }
+      if (retries > 0) setTimeout(() => tryInit(retries - 1), 200);
+    };
+
     if (document.querySelector(`script[src="${CAST_SDK}"]`)) {
-      const fw = (window as CastAny).cast?.framework; if (fw) initCtx(fw); return;
+      // SDK script already injected (e.g. hot reload) — framework may not be ready yet
+      tryInit();
+      return;
     }
+
     window.__onGCastApiAvailable = (ok: boolean) => {
       if (!ok) return;
-      const fw = (window as CastAny).cast?.framework; if (fw) initCtx(fw);
+      tryInit();
     };
-    const s = document.createElement('script'); s.src = CAST_SDK; s.async = true;
+    const s = document.createElement('script');
+    s.src = CAST_SDK;
+    s.async = true;
     document.head.appendChild(s);
     return () => { window.__onGCastApiAvailable = undefined; };
   }, [initCtx]);
@@ -156,7 +170,8 @@ function useChromecast(src: string) {
       const meta = new cc.media.GenericMediaMetadata();
       meta.title = src.split('/').pop()?.split('?')[0] ?? 'Video';
       mi.metadata = meta;
-      const req = new cc.media.LoadRequest(mi); req.autoplay = true;
+      const req = new cc.media.LoadRequest(mi);
+      req.autoplay = true;
       await session.loadMedia(req);
     } catch (e) { console.warn('[VideoStream] Cast error:', toErr(e)); }
   }, [src]);
@@ -199,7 +214,17 @@ function useVideoStream(src: string) {
         if (cancelled) return;
 
         if (Hls.isSupported()) {
-          const hls = new Hls({ enableWorker: true, lowLatencyMode: false });
+          const hls = new Hls({
+            enableWorker:     true,
+            lowLatencyMode:   false,
+            // ── Mobile buffer tuning ──────────────────────────────────────
+            // Keep a moderate forward buffer so mobile radios can sleep
+            // between bursts rather than streaming continuously.
+            maxBufferLength:    30,   // seconds of forward buffer to maintain
+            maxMaxBufferLength: 60,   // hard cap
+            maxBufferSize:      30 * 1000 * 1000, // 30 MB byte cap
+            startLevel:        -1,    // auto quality on first load
+          });
           hlsRef.current = hls;
           hls.loadSource(src);
           hls.attachMedia(el);
@@ -213,10 +238,12 @@ function useVideoStream(src: string) {
             }
           });
         } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
-          // Safari native HLS
+          // Safari / iOS native HLS
           el.src = src;
           const onCanPlay = () => { if (!cancelled) setReady(true); };
-          const onError   = () => { if (!cancelled) { console.warn('[VideoStream] native HLS error', el.error); setError(true); } };
+          const onError   = () => {
+            if (!cancelled) { console.warn('[VideoStream] native HLS error', el.error); setError(true); }
+          };
           el.addEventListener('canplay', onCanPlay, { once: true });
           Promise.resolve().then(() => {
             if (!cancelled) el.addEventListener('error', onError, { once: true });
@@ -230,7 +257,9 @@ function useVideoStream(src: string) {
       // ── Native video (MP4, WebM, etc.) ──────────────────────────────────
       el.src = src;
       const onCanPlay = () => { if (!cancelled) setReady(true); };
-      const onError   = () => { if (!cancelled) { console.warn('[VideoStream] video error', el.error); setError(true); } };
+      const onError   = () => {
+        if (!cancelled) { console.warn('[VideoStream] video error', el.error); setError(true); }
+      };
       el.addEventListener('canplay', onCanPlay, { once: true });
       Promise.resolve().then(() => {
         if (!cancelled) el.addEventListener('error', onError, { once: true });
@@ -259,7 +288,6 @@ function useVideoControls(
   const [muted,       setMuted]       = useState(false);
   const [buffering,   setBuffering]   = useState(false);
 
-  // Use rAF to throttle timeupdate so we only update state once per frame
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -269,7 +297,7 @@ function useVideoControls(
     const onPlay    = () => setPlaying(true);
     const onPause   = () => setPlaying(false);
     const onTime    = () => {
-      if (rafRef.current !== null) return; // already scheduled
+      if (rafRef.current !== null) return;
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
         setCurrentTime(el.currentTime);
@@ -318,7 +346,11 @@ function useVideoControls(
 
   const seek = useCallback((t: number) => {
     const el = videoRef.current; if (!el) return;
-    el.currentTime = Math.max(0, Math.min(t, el.duration || 0));
+    const clamped = Math.max(0, Math.min(t, el.duration || 0));
+    el.currentTime = clamped;
+    // Immediately sync React state so the seekbar updates while paused
+    // (no timeupdate fires when paused after a seek on mobile)
+    setCurrentTime(clamped);
   }, [videoRef]);
 
   const setVolume = useCallback((v: number) => {
@@ -361,8 +393,6 @@ function useControlsVisibility(playing: boolean) {
 }
 
 // ─── useFullscreen ────────────────────────────────────────────────────────────
-// Cross-platform fullscreen: prefers container requestFullscreen, falls back to
-// video.webkitEnterFullscreen for iOS Safari which only supports it on <video>.
 function useFullscreen(
   containerRef: React.RefObject<HTMLDivElement | null>,
   videoRef:     React.RefObject<HTMLVideoElement | null>,
@@ -371,7 +401,6 @@ function useFullscreen(
 
   useEffect(() => {
     const onFsChange = () => {
-      // Both standard and webkit variants
       const fsEl = document.fullscreenElement
         || (document as CastAny).webkitFullscreenElement
         || null;
@@ -379,7 +408,6 @@ function useFullscreen(
     };
     document.addEventListener('fullscreenchange',       onFsChange);
     document.addEventListener('webkitfullscreenchange', onFsChange);
-    // iOS fires this on the video element
     const vid = videoRef.current;
     if (vid) {
       vid.addEventListener('webkitbeginfullscreen', () => setIsFullscreen(true));
@@ -396,7 +424,6 @@ function useFullscreen(
     const video     = videoRef.current;
 
     if (isFullscreen) {
-      // Exit
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if ((document as CastAny).webkitExitFullscreen) {
@@ -405,13 +432,11 @@ function useFullscreen(
         (video as CastAny).webkitExitFullscreen();
       }
     } else {
-      // Enter — try container first (Android/desktop), fall back to video (iOS)
       if (container?.requestFullscreen) {
         container.requestFullscreen();
       } else if ((container as CastAny)?.webkitRequestFullscreen) {
         (container as CastAny).webkitRequestFullscreen();
       } else if (video && (video as CastAny).webkitEnterFullscreen) {
-        // iOS Safari: only <video> supports native fullscreen
         (video as CastAny).webkitEnterFullscreen();
       }
     }
@@ -465,9 +490,6 @@ function CtrlBtn({ onClick, label, children, active = false }: {
 }
 
 // ─── ProgressBar ─────────────────────────────────────────────────────────────
-// Smooth scrubbing: all drag math runs imperatively against the DOM, bypassing
-// React state. State is only updated on pointer-up (or on the rAF-throttled
-// timeupdate path when not dragging).
 function ProgressBar({ currentTime, duration, onSeek }: {
   currentTime: number; duration: number; onSeek: (t: number) => void;
 }) {
@@ -477,11 +499,9 @@ function ProgressBar({ currentTime, duration, onSeek }: {
   const dragging  = useRef(false);
   const [hov, setHov] = useState(false);
 
-  // Keep a ref to the latest duration so pointer callbacks don't stale-close
   const durationRef = useRef(duration);
   useEffect(() => { durationRef.current = duration; }, [duration]);
 
-  // Imperatively sync fill/thumb when NOT dragging (driven by rAF timeupdate)
   const pct = duration > 0 ? Math.min(currentTime / duration, 1) : 0;
   useEffect(() => {
     if (dragging.current) return;
@@ -501,6 +521,8 @@ function ProgressBar({ currentTime, duration, onSeek }: {
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Prevent the event from bubbling to the play-toggle overlay div
+    e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
     dragging.current = true;
     const t = toTime(e.clientX);
@@ -510,26 +532,32 @@ function ProgressBar({ currentTime, duration, onSeek }: {
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!dragging.current) return;
+    e.stopPropagation();
     const t = toTime(e.clientX);
-    // Imperatively update visuals — no setState, no re-render
     applyPct(durationRef.current > 0 ? t / durationRef.current : 0);
     onSeek(t);
   };
 
-  const onPointerUp = () => { dragging.current = false; };
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    dragging.current = false;
+  };
+
+  // Also stop click propagation so tapping the bar doesn't toggle play
+  const onClickCapture = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
     <div ref={trackRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onClickCapture={onClickCapture}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
         position: 'relative', width: '100%', height: hov ? 20 : 14,
         display: 'flex', alignItems: 'center', cursor: 'pointer',
         transition: 'height 0.15s',
-        // Expand touch target without affecting layout
         touchAction: 'none',
       }}>
       <div style={{
@@ -540,7 +568,6 @@ function ProgressBar({ currentTime, duration, onSeek }: {
         <div ref={fillRef} style={{
           position: 'absolute', left: 0, top: 0, bottom: 0,
           width: `${pct * 100}%`, background: 'white',
-          // GPU-composited — avoids layout during drag
           willChange: 'width',
         }} />
       </div>
@@ -580,9 +607,10 @@ function VolumeControl({ volume, muted, onVolume, onMute }: {
                     transition: 'width 0.22s cubic-bezier(0.4,0,0.2,1)',
                     display: 'flex', alignItems: 'center' }}>
         <div ref={trackRef}
-             onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); dragging.current = true; onVolume(toVol(e.clientX)); }}
+             onPointerDown={e => { e.stopPropagation(); e.currentTarget.setPointerCapture(e.pointerId); dragging.current = true; onVolume(toVol(e.clientX)); }}
              onPointerMove={e => { if (dragging.current) onVolume(toVol(e.clientX)); }}
-             onPointerUp={() => { dragging.current = false; }}
+             onPointerUp={e => { e.stopPropagation(); dragging.current = false; }}
+             onClickCapture={e => e.stopPropagation()}
              style={{ width: 68, height: 20, flexShrink: 0, display: 'flex', alignItems: 'center', cursor: 'pointer', touchAction: 'none' }}>
           <div style={{ position: 'relative', width: '100%', height: 3,
                         background: 'rgba(255,255,255,0.2)', borderRadius: 99, overflow: 'hidden' }}>
@@ -626,6 +654,7 @@ function VideoControls({ videoRef, containerRef, ready, visible, castState, cast
         </div>
       )}
 
+      {/* Play-toggle overlay — sits behind controls (z-index 1) */}
       <div onClick={togglePlay}
            style={{ position: 'absolute', inset: 0, cursor: 'pointer', zIndex: 1 }}
            aria-hidden />
@@ -696,7 +725,6 @@ export default function VideoStream({
   const { visible, show } = useControlsVisibility(playing);
   const { cursorHidden, onActivity } = useCursorHide(playing, isIframe);
 
-  // Combined handler: show controls AND reset cursor hide timer
   const handleActivity = useCallback(() => {
     show();
     onActivity();
@@ -712,8 +740,6 @@ export default function VideoStream({
       case 'ArrowRight': e.preventDefault(); if (el) el.currentTime = Math.min(el.duration || 0, el.currentTime + 5); break;
       case 'm': case 'M': e.preventDefault(); if (el) el.muted = !el.muted; break;
       case 'f': case 'F': e.preventDefault();
-        // Fullscreen via keyboard — delegate to the hook inside VideoControls.
-        // We re-implement the toggle logic here so the keyboard shortcut still works.
         if (document.fullscreenElement || (document as CastAny).webkitFullscreenElement) {
           (document.exitFullscreen || (document as CastAny).webkitExitFullscreen)?.call(document);
         } else {
@@ -733,8 +759,15 @@ export default function VideoStream({
         @keyframes vs-cast-pulse { 0%,100%{opacity:.6} 50%{opacity:1} }
         .vs-root:focus { outline: none; }
         .vs-root:focus-visible { box-shadow: 0 0 0 2px rgba(255,255,255,0.45); }
+        /* Hide cursor on the fullscreen element and everything inside it */
+        .vs-root.vs-cursor-hidden,
+        :fullscreen .vs-root.vs-cursor-hidden,
+        :-webkit-full-screen .vs-root.vs-cursor-hidden,
+        .vs-root.vs-cursor-hidden * { cursor: none !important; }
       `}</style>
-      <div ref={containerRef} className={`vs-root ${className}`} tabIndex={0}
+      <div ref={containerRef}
+           className={`vs-root${cursorHidden ? ' vs-cursor-hidden' : ''} ${className}`}
+           tabIndex={0}
            onKeyDown={handleKeyDown}
            onMouseMove={handleActivity}
            onTouchStart={handleActivity}
@@ -742,8 +775,6 @@ export default function VideoStream({
            style={{
              aspectRatio, position: 'relative', background: '#000',
              borderRadius: 'inherit', overflow: 'hidden',
-             // Hide cursor after inactivity while playing
-             cursor: cursorHidden ? 'none' : undefined,
            }}>
 
         {(!ready || error) && !isUnsupported && (
@@ -792,6 +823,7 @@ export default function VideoStream({
           }}
           controls={false} autoPlay={autoPlay} muted={muted} loop={loop}
           playsInline poster={poster}
+          preload="metadata"
         />
 
         {isIframe && (
