@@ -17,7 +17,7 @@ export default function Page() {
                 <div className="tab1">
                     is an extension of the historic avant-garde media archive <a href="https://ubu.com" className="linkout" target="_blank">UbuWeb</a> that supports account creation, bookmarking, and commenting.
                 </div>
-                <div className="tab1">
+                <div className="tab2">
                     (ubutube.org is not affiliated with ubu.com in any way.)
                 </div>
                 <br/>
