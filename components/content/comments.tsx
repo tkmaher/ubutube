@@ -57,7 +57,7 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
         async function fetchComments() {
             try {
                 const res = await fetch(
-                    `https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${filmId}/comments`
+                    `https://api.ubutube.org/api/films/${filmId}/comments`
                 );
                 const data: { cached: boolean; comments: Comment[]; success: boolean } = await res.json();
                 if (data.success) setComments(data.comments);
@@ -96,7 +96,7 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
 
         setSubmitting(true);
         try {
-            const res = await fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/auth/comments`, {
+            const res = await fetch(`https://api.ubutube.org/api/auth/comments`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -134,7 +134,7 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
     const handleDelete = useCallback(
         async (date: string) => {
             try {
-                const res = await fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/auth/comments`, {
+                const res = await fetch(`https://api.ubutube.org/api/auth/comments`, {
                     method: "DELETE",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },

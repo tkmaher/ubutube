@@ -207,7 +207,7 @@ function CommentDisplay({ userData, setUserData }: {
         if (!confirm("Delete this comment?")) return;
         setDeleting(true);
         try {
-            const res = await fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/auth/comments`, {
+            const res = await fetch(`https://api.ubutube.org/api/auth/comments`, {
                 method: "DELETE",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
@@ -282,7 +282,7 @@ export default function UserViewer({ slug, initialData }: { slug: string; initia
     useEffect(() => {
         if (initialData) return;
         setLoading(true);
-        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/users/${slug}`)
+        fetch(`https://api.ubutube.org/api/users/${slug}`)
             .then(res => res.json())
             .then((data: { cached: boolean; user: UserRaw; success: boolean }) => {
                 if (data.success && data.user) {

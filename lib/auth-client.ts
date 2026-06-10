@@ -1,4 +1,4 @@
-const API = "https://ubu-worker.tomaszkkmaher.workers.dev";
+const API = "https://api.ubutube.org";
 
 export type AuthUser = { id: string; username: string; email: string; bookmarks: string; link: string };
 

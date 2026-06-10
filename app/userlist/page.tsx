@@ -6,7 +6,7 @@ import "@/styles/content.scss";
 
 const getUserList = cache(async (page: number, order: string): Promise<UserList | null> => {
     const res = await fetch(
-        `https://ubu-worker.tomaszkkmaher.workers.dev/api/userList?page=${page}&order=${order}`,
+        `https://api.ubutube.org/api/userList?page=${page}&order=${order}`,
         { next: { tags: [`userList-${page}-${order}`], revalidate: 3600 } }
     );
     console.log(`Fetching user list for page ${page} and order ${order}. Status: ${res.status}`);

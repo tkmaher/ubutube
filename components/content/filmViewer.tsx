@@ -131,7 +131,7 @@ export default function FilmViewer({
     }, [bookmarks, bookmarkSlug]);
 
     useEffect(() => {
-        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}/views`)
+        fetch(`https://api.ubutube.org/api/films/${slug}/views`)
             .then(res => res.json())
             .then((data: { views: number; success: boolean }) => {
                 if (data.success) setViews(data.views);
@@ -142,7 +142,7 @@ export default function FilmViewer({
     useEffect(() => {
         if (initialData) return;
         setLoading(true);
-        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${slug}`, {next: { revalidate: 86400 }} )
+        fetch(`https://api.ubutube.org/api/films/${slug}`, {next: { revalidate: 86400 }} )
             .then(res => res.json())
             .then((data: { cached: boolean; film: Film; success: boolean }) => {
                 if (data.success) {

@@ -6,7 +6,7 @@ import "@/styles/content.scss";
 
 const getFilmData = cache(async (filmSlug: string): Promise<Film | null> => {
     const res = await fetch(
-        `https://ubu-worker.tomaszkkmaher.workers.dev/api/films/${filmSlug}`,
+        `https://api.ubutube.org/api/films/${filmSlug}`,
         {next: { revalidate: 86400 }} 
     );
     const data: { cached: boolean; film: Film; success: boolean } = await res.json();

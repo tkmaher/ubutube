@@ -61,7 +61,7 @@ export default function ArtistViewer({
     useEffect(() => {
         if (initialData) return;
         setLoading(true);
-        fetch(`https://ubu-worker.tomaszkkmaher.workers.dev/api/artists/${slug}`, {next: { revalidate: 86400 }} )
+        fetch(`https://api.ubutube.org/api/artists/${slug}`, {next: { revalidate: 86400 }} )
             .then(res => res.json())
             .then((data: { cached: boolean; artist: Artist; success: boolean }) => {
                 if (data.success) setArtistData(data.artist);

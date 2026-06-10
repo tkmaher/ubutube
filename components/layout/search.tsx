@@ -75,7 +75,7 @@ export default function Search() {
     useEffect(() => {
         setLoading(true);
         fetch(
-            `https://ubu-worker.tomaszkkmaher.workers.dev/api/search?${new URLSearchParams(
+            `https://api.ubutube.org/api/search?${new URLSearchParams(
                 { queryString: searchQuery }
             )}`,
             { next: { revalidate: 86400 } }
