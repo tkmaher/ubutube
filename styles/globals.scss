@@ -129,12 +129,10 @@ button {
 }
 
 .tooltip-parent {
-  @media (hover: hover) {
     &:hover .tooltip {
       display: block;
     }
     
-  }
 
   .tooltip {
     display: none;
@@ -221,7 +219,5 @@ button {
     background-color: $secondary;
   }
 
-  .tooltip-parent:active .tooltip {
-    display: block;
-  }
+
 }

@@ -15,6 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <meta interactive-widget="resizes-content">
+      </meta>
       <body>
           <AuthProvider>
             <Columns children={children}/>
