@@ -3,7 +3,7 @@
 import { UserList } from "@/types/objects";
 import ReactLenis from "lenis/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "@/styles/content.scss";
 import "@/styles/search.scss";
 
@@ -19,13 +19,19 @@ export default function UserListViewer({ initialData, page, order }: {
     const [error, setError] = useState(false);
     const [userList, setUserList] = useState<UserList | null>(initialData);
 
+    const isInitialRender = useRef(true);
+
     useEffect(() => {
-        if (initialData) return;
+        if (isInitialRender.current && initialData) {
+            isInitialRender.current = false;
+            return;
+        }
+        isInitialRender.current = false;
+
         setLoading(true);
-        fetch(`https://api.ubutube.org/api/userList?page=${page ?? 1}&order=${order}`, {next: { revalidate: 3600 }} )
+        fetch(`https://api.ubutube.org/api/userList?page=${page ?? 1}&order=${order}`)
             .then(res => res.json())
             .then((data: { cached: boolean; userList: UserList; success: boolean }) => {
-                console.log(`Fetched user list for page ${page} and order ${order}. Got:`, data);
                 if (data.success && data.userList) {
                     setUserList(data.userList);
                 } else {
