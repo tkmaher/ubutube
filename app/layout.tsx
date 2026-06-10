@@ -4,9 +4,11 @@ import "@/styles/search.scss";
 import { AuthProvider } from "@/context/AuthContext";
 
 import { staticMetadata } from "./metadata";
+export { viewport } from "./metadata";
 import Columns from "@/components/layout/main";
 
 export const metadata: Metadata = staticMetadata;
+
 
 export default function RootLayout({
   children,
@@ -15,8 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <meta interactive-widget="resizes-content">
-      </meta>
+      <head>
+        <meta 
+          name="viewport" 
+          content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" 
+        />
+      </head>
       <body>
           <AuthProvider>
             <Columns children={children}/>

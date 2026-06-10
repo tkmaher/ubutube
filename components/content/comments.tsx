@@ -163,7 +163,7 @@ export default function Comments({filmId, filmName}: {filmId: string, filmName: 
             <div className="content-desc">
                 <form onSubmit={handleSubmit}>
                     <textarea 
-                        placeholder="Please help maintain the quality of our site. Comments must be a minimum of 15 words long." 
+                        placeholder="Comments must be a minimum of 15 words long." 
                         className="comment-input" 
                         value={currComment}
                         onChange={e => setCurrComment(e.target.value)}

@@ -100,6 +100,7 @@ export default function FilmViewer({
     const { bookmarks, setBookmarks, user } = useAuth();
 
     const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isShared, setIsShared] = useState(false);
     const [filmData, setFilmData] = useState<Film>(
         initialData ?? {
             name: "", artists: [""], description: "",
@@ -183,6 +184,7 @@ export default function FilmViewer({
 
     const shareCallback = async () => {
         await navigator.clipboard.writeText(`https://ubutube.org/film/${slug}`);
+        setIsShared(true);
     };
 
     if (error) return <div className="about">Film {decodedSlug} not found!</div>;
@@ -241,7 +243,7 @@ export default function FilmViewer({
                         callback={bookmarkCallback}
                     />
                     <VideoButton
-                        buttonText="Share"
+                        buttonText={isShared ? "Link copied" : "Share"}
                         text1="Copy link"
                         text2="Link copied to clipboard!"
                         callback={shareCallback}
