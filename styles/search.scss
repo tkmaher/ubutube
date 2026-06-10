@@ -6,12 +6,8 @@
   flex-grow: 1;
   box-sizing: border-box;
   transition: opacity 0.1s ease-in-out;
-  overflow-y: auto;
-  overflow-x: none;
-
-  .right-bar {
-    height: 100dvh;
-  }
+  overflow: hidden;
+  height: 100dvh;
 
   @media (min-width: 801px) {
     min-width: 15dvw;
