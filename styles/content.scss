@@ -40,10 +40,7 @@
         display: flex;
         gap: 0.5em;
 
-        button {
-            font-size: 16px;
-            font-family: $font !important;
-        }
+        
     }
 
     @media (max-width: 800px) {
