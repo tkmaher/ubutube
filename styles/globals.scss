@@ -193,17 +193,11 @@ button {
     flex-grow: 0;
     overflow: hidden;
 
-    &:active {
-      background-color: $secondary;
-    }
   }
 
   .panel-active {
     
     cursor: default;
-    &:active {
-      background-color: transparent !important;
-    }
   }
 
   .column-panel:not(.panel-active) a,
