@@ -23,8 +23,10 @@ button {
 .appcontainer {
   display: flex;
   overflow: hidden;
-  height: 100dvh;
-  max-height: 100dvh;
+  height: calc(100dvh - 1.6em);
+  max-height: calc(100dvh - 1.6em);
+  margin: 0.8em;
+  border: 1px solid $foreground;
 }
 
 a, a:visited, a:hover, a:active {
@@ -41,9 +43,8 @@ a, a:visited, a:hover, a:active {
   justify-content: center;
   align-items: center;
   img {
-    max-width: calc(100% - 0.4em);
+    max-width: 100%;
     height: auto;
-    margin: 0.2em;
     transition: opacity 0.2s ease-in-out;
   }
 }
@@ -185,7 +186,7 @@ button {
 
 @media (max-width: 800px) {
   .appcontainer {
-    height: 100dvh;
+    height: calc(100dvh - 1.6em);
   }
 
   .column-panel {
